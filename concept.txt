@@ -48,10 +48,18 @@ ENEMY SPAWNING
 > Enemies should not spawn near players
 > The density of enemies in an area should be capped
 
+HEALTH
+> All players have the same maximum HP
+> If an enemy touches a player, the player loses 1 HP
+> After a player loses HP, they become invincible for a short time
+> Players can eat bread to regain HP
+> If a player touches the oven, they heal completely
+
 DEATH
-> If an enemy touches a player, the player dies
+> If a player reaches 0 HP, they die
 > If a player dies, they drop all of their ingredients on the ground
 > If a player dies, they respawn in the center of the map
+> Players respawn with maximum HP
 
 USER INTERFACE
 > Zoom in and out
