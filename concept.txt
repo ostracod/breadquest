@@ -25,7 +25,7 @@ PLAYER TRAIL
 BREAD BAKING
 > Ingredients distributed throughout the world
 > Ingredients include water, flour, and baking powder
-> Oven in the center of the world
+> There is an oven in the center of the world
 > The oven can turn ingredients into bread
 > Requires 1:1:1 ratio
 
@@ -53,7 +53,8 @@ HEALTH
 > If an enemy touches a player, the player loses 1 HP
 > After a player loses HP, they become invincible for a short time
 > Players can eat bread to regain HP
-> If a player touches the oven, they heal completely
+> There is a hospital in the center of the world
+> If a player touches the hospital, they heal completely
 
 DEATH
 > If a player reaches 0 HP, they die
