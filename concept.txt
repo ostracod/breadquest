@@ -1,0 +1,63 @@
+
+BREADQUEST CONCEPT
+
+GENERAL
+> 2D top-down view
+> Infinitely large world
+
+ACCOUNT
+> Account creation
+> Log in system
+> Ability to change password
+
+PLAYER
+> Players have infinitely large inventory
+> Player name and bread count displayed over each player
+> Players do not collide
+> Player position persists between logins
+
+PLAYER TRAIL
+> Players should leave a visible trail wherever they go
+> Player color (for avatar and trail)
+> Player color chosen during account creation
+
+BREAD BAKING
+> Ingredients distributed throughout the world
+> Ingredients include water, flour, and baking powder
+> Oven in the center of the world
+> The oven can turn ingredients into bread
+> Requires 1:1:1 ratio
+
+COLORED BLOCKS
+> Randomly generated blocks
+> Each block has a color
+> Player cannot walk through blocks
+> It should take time to pick up blocks
+
+ENEMIES
+> Enemies should move toward players when they are nearby
+> Enemies should move randomly when idle
+> If an enemy collides with a block while pursuing a player, it should enter idle mode for a short time
+> Enemies should not be able to enter the player spawn area
+> When a player logs in (after a long period of inactvity), nearby enemies will be removed
+
+ENEMY SPAWNING
+> Enemies should not spawn in the player spawn area
+> Enemies should not spawn on player trails
+> Enemies should not spawn near players
+> The density of enemies in an area should be capped
+
+DEATH
+> If an enemy touches a player, the player dies
+> If a player dies, they drop all of their ingredients on the ground
+> If a player dies, they respawn in the center of the map
+
+USER INTERFACE
+> Zoom in and out
+> Display coordinates
+> Compass pointing toward oven
+> Chat system
+> List of online players
+> Leaderboard based on bread
+
+
