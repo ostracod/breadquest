@@ -1,0 +1,20 @@
+{
+  "name": "breadquest",
+  "version": "0.0.0",
+  "private": false,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.17.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.3",
+    "express": "~4.15.2",
+    "express-session": "^1.15.2",
+    "jade": "~1.11.0",
+    "morgan": "~1.8.1",
+    "mustache-express": "^1.2.4",
+    "rootpath": "^0.1.2",
+    "serve-favicon": "~2.4.2"
+  }
+}
