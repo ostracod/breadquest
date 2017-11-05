@@ -22,11 +22,17 @@ PLAYER TRAIL
 > Player color chosen during account creation
 > Trail is deleted when a block or item is placed over it
 
+REST ZONES
+> Rest zones are square regions all with the same size
+> Each rest zone contains an oven and a hospital
+> There is a rest zone at (0, 0)
+> Rest zones can generate in other locations
+> Rest zones are spread out very far from each other
+
 BREAD BAKING
 > Ingredients distributed throughout the world
 > Ingredients include water, flour, and baking powder
-> There is an oven in the center of the world
-> The oven can turn ingredients into bread
+> An oven can turn ingredients into bread
 > Requires 1:1:1 ratio
 
 COLORED BLOCKS
@@ -39,11 +45,11 @@ ENEMIES
 > Enemies should move toward players when they are nearby
 > Enemies should move randomly when idle
 > If an enemy collides with a block while pursuing a player, it should enter idle mode for a short time
-> Enemies should not be able to enter the player spawn area
+> Enemies should not be able to enter rest zones
 > When a player logs in (after a long period of inactvity), nearby enemies will be removed
 
 ENEMY SPAWNING
-> Enemies should not spawn in the player spawn area
+> Enemies should not spawn in rest zones
 > Enemies should not spawn on player trails
 > Enemies should not spawn near players
 > The density of enemies in an area should be capped
@@ -53,19 +59,18 @@ HEALTH
 > If an enemy touches a player, the player loses 1 HP
 > After a player loses HP, they become invincible for a short time
 > Players can eat bread to regain HP
-> There is a hospital in the center of the world
-> If a player touches the hospital, they heal completely
+> If a player touches a hospital, they heal completely
 
 DEATH
 > If a player reaches 0 HP, they die
 > If a player dies, they drop all of their ingredients on the ground
-> If a player dies, they respawn in the center of the map
+> If a player dies, they respawn at the last rest zone they visited
 > Players respawn with maximum HP
 
 USER INTERFACE
 > Zoom in and out
 > Display coordinates
-> Compass pointing toward oven
+> Compass pointing toward last rest zone
 > Chat system
 > List of online players
 > Leaderboard based on bread
