@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <script src="javascript/global.js"></script>
+        <link type="text/css" rel="stylesheet" media="all" href="stylesheets/global.css" />
+        <script>
+
+var isCreatingAccount = false;
+
+function CreateAccountRequest(username, password, email) {
+    if (isCreatingAccount) {
+        return;
+    }
+    isCreatingAccount = true;
+    document.getElementById("message").innerHTML = "Creating account...";
+    // Send as POST data to avoid sneeky peeking at log files.
+    AjaxRequest.call(this, "createAccountAction", {}, {
+        username: username,
+        password: password,
+        email: email
+    });
+}
+setParentClass(CreateAccountRequest, AjaxRequest);
+
+CreateAccountRequest.prototype.respond = function(data) {
+    isCreatingAccount = false;
+    document.getElementById("message").innerHTML = "";
+    if (data.success) {
+        alert("Your account was created successfully.");
+        window.location = "login";
+    } else {
+        alert(data.message);
+    }
+    AjaxRequest.prototype.respond.call(this, data);
+}
+
+function processFields() {
+    var tempUsername = document.getElementById("username").value;
+    var tempPassword = document.getElementById("password").value;
+    var tempConfirmPassword = document.getElementById("confirmPassword").value;
+    var tempEmail = document.getElementById("email").value;
+    if (tempUsername.length < 1) {
+        alert("Please enter a username.");
+        return;
+    }
+    if (tempUsername.length > 30) {
+        alert("Your username must be at most 30 characters long.");
+        return;
+    }
+    if (tempPassword.length < 1) {
+        alert("Please enter your password.");
+        return;
+    }
+    if (tempPassword != tempConfirmPassword) {
+        alert("The passwords you entered do not match.");
+        return;
+    }
+    if (tempEmail.length < 1) {
+        alert("Please enter an email address.");
+        return;
+    }
+    if (tempEmail.indexOf("@") < 0 || tempEmail.indexOf(".") < 0) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+    new CreateAccountRequest(tempUsername, tempPassword, tempEmail);
+    return;
+}
+
+        </script>
+    </head>
+    <body>
+        <div id="content">
+            <h2>BREADQUEST</h2>
+            <p>
+                <a href="login">Return to Log In</a>
+            </p>
+            <h2>CREATE ACCOUNT</h2>
+            <form onsubmit="processFields(); return false;">
+                <table>
+                    <tr>
+                        <td>Username:</td>
+                        <td><input id="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" /></td>
+                    </tr>
+                    <tr>
+                        <td>Password:</td>
+                        <td><input id="password" type="password" /></td>
+                    </tr>
+                    <tr>
+                        <td>Confirm Password:</td>
+                        <td><input id="confirmPassword" type="password" /></td>
+                    </tr>
+                    <tr>
+                        <td>Email Address:</td>
+                        <td><input id="email" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" /></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" /></td>
+                    </tr>
+                </table>
+            </form>
+            <p id="message">
+            
+            </p>
+        </div>
+    </body>
+</html>

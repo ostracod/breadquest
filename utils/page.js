@@ -1,5 +1,5 @@
 
-var app = require("app");
+var app = require("breadQuest");
 
 var mode = app.get("env");
 

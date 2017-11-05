@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <script src="javascript/global.js"></script>
+        <link type="text/css" rel="stylesheet" media="all" href="stylesheets/global.css" />
+        <script>
+
+var isLoggingIn = false;
+
+function LoginRequest(username, password) {
+    if (isLoggingIn) {
+        return;
+    }
+    isLoggingIn = true;
+    document.getElementById("message").innerHTML = "Logging in...";
+    // Send as POST data to avoid sneeky peeking at log files.
+    AjaxRequest.call(this, "loginAction", {}, {
+        username: username,
+        password: password
+    });
+}
+setParentClass(LoginRequest, AjaxRequest);
+
+LoginRequest.prototype.respond = function(data) {
+    isLoggingIn = false;
+    document.getElementById("message").innerHTML = "";
+    if (data.success) {
+        window.location = "menu";
+    } else {
+        alert(data.message);
+    }
+    AjaxRequest.prototype.respond.call(this, data);
+}
+
+function processFields() {
+    var tempUsername = document.getElementById("username").value;
+    var tempPassword = document.getElementById("password").value;
+    if (tempUsername.length < 1) {
+        alert("Please enter a username.");
+        return;
+    }
+    if (tempPassword.length < 1) {
+        alert("Please enter your password.");
+        return;
+    }
+    new LoginRequest(tempUsername, tempPassword);
+    return;
+}
+
+        </script>
+    </head>
+    <body>
+        <div id="content">
+            <h2>BREADQUEST</h2>
+            <p>
+                A game by Jack Eisenmann
+            </p>
+            <h2>LOG IN</h2>
+            <form onsubmit="processFields(); return false;">
+                <table>
+                    <tr>
+                        <td>Username:</td>
+                        <td><input id="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" /></td>
+                    </tr>
+                    <tr>
+                        <td>Password:</td>
+                        <td><input id="password" type="password" /></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" /></td>
+                    </tr>
+                </table>
+            </form>
+            <p id="message">
+            
+            </p>
+            <p>
+                <a href="createAccount">Create a New Account</a>
+            </p>
+        </div>
+    </body>
+</html>

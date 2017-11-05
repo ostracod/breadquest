@@ -6,6 +6,11 @@ var accountsFile;
 var accountsFileLock = false;
 var accountEntryLength = 1000;
 
+if (!fs.existsSync(accountsFilePath)) {
+    var tempFile = fs.openSync(accountsFilePath, "w");
+    fs.closeSync(tempFile);
+}
+
 function AccountUtils() {
 
 }

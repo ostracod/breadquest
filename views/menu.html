@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <script src="javascript/global.js"></script>
+        <link type="text/css" rel="stylesheet" media="all" href="stylesheets/global.css" />
+        {{#isAdmin}}
+        <script>
+
+function stopServer() {
+    var tempResult = confirm("Are you sure you want to stop the server?");
+    if (tempResult) {
+        window.location = "stopServer";
+    }
+}
+
+        </script>
+        {{/isAdmin}}
+    </head>
+    <body>
+        <div id="content">
+            <h2>BREADQUEST</h2>
+            <h2>MAIN MENU</h2>
+            <p>
+                Hello {{username}}!
+            </p>
+            <p>
+                <button onclick="window.open('game', '_blank');">Enter World</button>
+            </p>
+            <p>
+                <a href="leaderBoard">Leader Board</a>
+            </p>
+            <p>
+                <a href="changePassword">Change Password</a>
+            </p>
+            <p>
+                <button onclick="window.location='logoutAction';">Log Out</button>
+            </p>
+            {{#isAdmin}}
+            <p>
+                <button style="background: #FF4444;" onclick="stopServer();">Stop Server</button>
+            </p>
+            {{/isAdmin}}
+        </div>
+    </body>
+</html>
