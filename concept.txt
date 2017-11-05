@@ -21,6 +21,7 @@ PLAYER TRAIL
 > Player color (for avatar and trail)
 > Player color chosen during account creation
 > Trail is deleted when a block or item is placed over it
+> Player can spend bread to change their color
 
 REST ZONES
 > Rest zones are square regions all with the same size
