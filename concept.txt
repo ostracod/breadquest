@@ -50,7 +50,7 @@ ENEMIES
 
 ENEMY SPAWNING
 > Enemies should not spawn in rest zones
-> Enemies should not spawn on player trails
+> Enemies should not spawn on player trails or symbol tiles
 > Enemies should not spawn near players
 > The density of enemies in an area should be capped
 
@@ -66,6 +66,11 @@ DEATH
 > If a player dies, they drop all of their ingredients on the ground
 > If a player dies, they respawn at the last rest zone they visited
 > Players respawn with maximum HP
+
+SYMBOL TILES
+> Include letters, numbers, and punctuation
+> Players can walk over symbol tiles
+> Players use a text box to automatically place symbol tiles
 
 USER INTERFACE
 > Zoom in and out
