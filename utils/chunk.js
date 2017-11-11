@@ -120,6 +120,24 @@ ChunkUtils.prototype.loadChunk = function(pos) {
     return output;
 }
 
+ChunkUtils.prototype.getTiles = function(pos, size) {
+    var output = [];
+    var tempPos = new Pos(0, 0);
+    var tempOffset = new Pos(0, 0);
+    while (tempOffset.y < size) {
+        tempPos.set(pos);
+        tempPos.add(tempOffset);
+        var tempTile = this.getTile(tempPos);
+        output.append(tempTile);
+        tempOffset.x += 1;
+        if (tempOffset.x >= size) {
+            tempOffset.x = 0;
+            tempOffset.y += 1;
+        }
+    }
+    return output;
+}
+
 ChunkUtils.prototype.getTile = function(pos) {
     var tempPos = this.convertPosToChunkPos(pos);
     var tempChunk = this.getChunk(tempPos);

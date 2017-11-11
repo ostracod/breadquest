@@ -3,7 +3,7 @@ var router = express.Router();
 var bcrypt = require("bcrypt");
 var pageUtils = require("utils/page.js");
 var accountUtils = require("utils/account.js");
-var chunkUtils = require("utils/chunk.js");
+var chunkUtils = require("utils/game.js");
 var app = require("breadQuest");
 
 var checkAuthentication = pageUtils.checkAuthentication;
@@ -223,10 +223,16 @@ router.get("/game", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, n
 });
 
 router.post("/gameUpdate", checkAuthentication(JSON_ERROR_OUTPUT), function(req, res, next) {
-    res.json({
-        success: true,
-        commandList: []
-    });
+    function performUpdate() {
+        gameUtils.performUpdate(req.session.username, JSON.parse(req.body.commandList), function(result) {
+            res.json(result);
+        });
+    }
+    if (mode == "development") {
+        setTimeout(performUpdate, 50 + Math.floor(Math.random() * 150));
+    } else {
+        performUpdate();
+    }
 });
 
 module.exports = router;
