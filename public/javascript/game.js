@@ -32,6 +32,7 @@ var localPlayerHp = 0;
 var localPlayerMaximumHp = 5;
 var hasStopped = false;
 var lastActivityTime = 0;
+var colorSet;
 
 var moduleList = [];
 
@@ -188,6 +189,18 @@ Color.prototype.equals = function(color) {
 Color.prototype.toString = function() {
     return "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
 }
+
+colorSet = [
+    new Color(255, 64, 64),
+    new Color(255, 128, 0),
+    new Color(192, 192, 64),
+    new Color(0, 192, 0),
+    new Color(0, 192, 192),
+    new Color(64, 64, 255),
+    new Color(192, 0, 192),
+    new Color(128, 128, 128),
+    new Color(0, 0, 0)
+];
 
 function OverlayChatMessage(playerName, text) {
     this.tag = document.createElement("div");
@@ -353,6 +366,22 @@ function drawSprite(pos, which) {
     );
 }
 
+function drawSquare(pos, colorIndex, isSmall) {
+    var tempColor = colorSet[colorIndex];
+    var tempPosX = pos.x * spriteRenderSize;
+    var tempPosY = pos.y * spriteRenderSize;
+    var tempSize;
+    if (isSmall) {
+        tempPosX += spriteRenderSize * 3 / 8;
+        tempPosY += spriteRenderSize * 3 / 8;
+        tempSize = spriteRenderSize / 4;
+    } else {
+        tempSize = spriteRenderSize;
+    }
+    context.fillStyle = tempColor.toString();
+    context.fillRect(tempPosX, tempPosY, tempSize, tempSize);
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -459,7 +488,13 @@ function timerEvent() {
     clearCanvas();
     var tempPos = new Pos(0, 0);
     while (tempPos.y < canvasSpriteSize) {
-        drawSprite(tempPos, Math.floor(Math.random() * 2) + 6);
+        if (tempPos.x == 3 && tempPos.y == 2) {
+            drawSquare(tempPos, Math.floor(Math.random() * 9), false);
+        } else if (tempPos.x == 4 && tempPos.y == 2) {
+            drawSquare(tempPos, Math.floor(Math.random() * 9), true);
+        } else {
+            drawSprite(tempPos, Math.floor(Math.random() * 2) + 6);
+        }
         tempPos.x += 1;
         if (tempPos.x >= canvasSpriteSize) {
             tempPos.x = 0;
