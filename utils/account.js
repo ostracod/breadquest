@@ -53,7 +53,7 @@ AccountUtils.prototype.getAccount = function(index, done) {
         console.log("Missing lock!");
         return;
     }
-    var tempBuffer = Buffer.alloc(accountEntryLength, 0, "utf8");
+    var tempBuffer = Buffer.alloc(accountEntryLength, 0);
     fs.read(accountsFile, tempBuffer, 0, accountEntryLength, index * accountEntryLength, function(error, count, buffer) {
         if (error) {
             done(error, null);
