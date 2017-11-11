@@ -33,6 +33,8 @@ var localPlayerMaximumHp = 5;
 var hasStopped = false;
 var lastActivityTime = 0;
 var colorSet;
+var tileBuffer = [];
+var tileBufferSize = 100;
 
 var moduleList = [];
 
@@ -88,7 +90,53 @@ function addGetEntitiesCommand() {
 }
 
 function performSetTilesCommand(command) {
-    console.log(command);
+    var tempPos = createPosFromJson(command.pos);
+    var tempSize = command.size;
+    var tempTileList = command.tileList;
+    resetTileBuffer();
+    var index = 0;
+    var tempPos2 = new Pos(0, 0);
+    var tempOffset = new Pos(0, 0);
+    while (tempOffset.y < tempSize) {
+        var tempTile = tempTileList[index];
+        tempPos2.set(tempPos);
+        tempPos2.add(tempOffset);
+        setTileBufferValue(tempPos2, tempTile);
+        index += 1;
+        tempOffset.x += 1;
+        if (tempOffset.x >= tempSize) {
+            tempOffset.x = 0;
+            tempOffset.y += 1;
+        }
+    }
+}
+
+function resetTileBuffer() {
+    var index = 0;
+    while (index < tileBuffer.length) {
+        tileBuffer[index] = 0;
+        index += 1;
+    }
+    var tempLength = tileBufferSize * tileBufferSize;
+    while (tileBuffer.length < tempLength) {
+        tileBuffer.push(0);
+    }
+}
+
+function convertPosToTileBufferIndex(pos) {
+    var tempOffsetX = betterModulus(pos.x, tileBufferSize);
+    var tempOffsetY = betterModulus(pos.y, tileBufferSize);
+    return tempOffsetX + tempOffsetY * tileBufferSize;
+}
+
+function getTileBufferValue(pos) {
+    var index = convertPosToTileBufferIndex(pos);
+    return tileBuffer[index];
+}
+
+function setTileBufferValue(pos, value) {
+    var index = convertPosToTileBufferIndex(pos);
+    tileBuffer[index] = value;
 }
 
 function Pos(x, y) {
@@ -145,7 +193,7 @@ function createPosFromJson(data) {
     return new Pos(data.x, data.y);
 }
 
-cameraPos = new Pos(-20, -20);
+cameraPos = new Pos(0, 0);
 
 function Color(r, g, b) {
     this.r = r;
@@ -499,18 +547,18 @@ function timerEvent() {
     
     clearCanvas();
     var tempPos = new Pos(0, 0);
-    while (tempPos.y < canvasSpriteSize) {
-        if (tempPos.x == 3 && tempPos.y == 2) {
-            drawSquare(tempPos, Math.floor(Math.random() * 9), false);
-        } else if (tempPos.x == 4 && tempPos.y == 2) {
-            drawSquare(tempPos, Math.floor(Math.random() * 9), true);
-        } else {
-            drawSprite(tempPos, Math.floor(Math.random() * 2) + 6);
+    var tempOffset = new Pos(0, 0);
+    while (tempOffset.y < canvasSpriteSize) {
+        tempPos.set(cameraPos);
+        tempPos.add(tempOffset);
+        var tempTile = getTileBufferValue(tempPos);
+        if (tempTile == 129) {
+            drawSquare(tempPos, 0, false);
         }
-        tempPos.x += 1;
-        if (tempPos.x >= canvasSpriteSize) {
-            tempPos.x = 0;
-            tempPos.y += 1;
+        tempOffset.x += 1;
+        if (tempOffset.x >= canvasSpriteSize) {
+            tempOffset.x = 0;
+            tempOffset.y += 1;
         }
     }
     
