@@ -1,4 +1,12 @@
 
+function ChunkUtils() {
+    this.chunkList = [];
+}
+
+var chunkUtils = new ChunkUtils();
+
+module.exports = chunkUtils;
+
 var fs = require("fs");
 var pathUtils = require("path");
 
@@ -21,10 +29,6 @@ var fileSize = fileChunkSize * chunkSize;
 
 if (!fs.existsSync(chunksDirectoryPath)) {
     fs.mkdirSync(chunksDirectoryPath);
-}
-
-function ChunkUtils() {
-    this.chunkList = [];
 }
 
 ChunkUtils.prototype.convertPosToChunkPos = function(pos) {
@@ -122,6 +126,3 @@ ChunkUtils.prototype.getTile = function(pos) {
     return tempChunk.getTile(pos);
 }
 
-var chunkUtils = new ChunkUtils();
-
-module.exports = chunkUtils;
