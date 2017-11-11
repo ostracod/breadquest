@@ -42,16 +42,17 @@ ChunkUtils.prototype.convertPosToFilePos = function(pos) {
 }
 
 ChunkUtils.prototype.getChunk = function(pos) {
-    var tempPos = this.convertPosToChunkPos(pos);
     var index = 0;
     while (index < this.chunkList.length) {
         var tempChunk = this.chunkList[index];
-        if (tempChunk.pos.equals(tempPos)) {
+        if (tempChunk.pos.equals(pos)) {
             return tempChunk;
         }
         index += 1;
     }
-    return this.loadChunk(tempPos);
+    var output = this.loadChunk(pos);
+    this.chunkList.append(output);
+    return output;
 }
 
 ChunkUtils.prototype.getChunkCountInFile = function(file) {
@@ -113,6 +114,12 @@ ChunkUtils.prototype.loadChunk = function(pos) {
     }
     fs.closeSync(tempFile);
     return output;
+}
+
+ChunkUtils.prototype.getTile = function(pos) {
+    var tempPos = this.convertPosToChunkPos(pos);
+    var tempChunk = this.getChunk(tempPos);
+    return tempChunk.getTile(pos);
 }
 
 var chunkUtils = new ChunkUtils();

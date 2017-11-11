@@ -9,6 +9,17 @@ function Chunk(pos, data) {
     this.data = data;
 }
 
+Chunk.prototype.convertPosToIndex = function(pos) {
+    var tempOffsetX = pos.x - this.pos.x;
+    var tempOffsetY = pos.y - this.pos.y;
+    return (tempOffsetX + tempOffsetY * chunkSize) * chunkTileLength;
+}
+
+Chunk.prototype.getTile = function(pos) {
+    var index = this.convertPosToIndex(pos);
+    return this.data[index];
+}
+
 module.exports = {
     Chunk: Chunk,
     chunkSize: chunkSize,
