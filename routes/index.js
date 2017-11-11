@@ -217,4 +217,15 @@ router.get("/stopServer", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, 
     }
 });
 
+router.get("/game", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, next) {
+    res.render("game.html", {});
+});
+
+router.post("/gameUpdate", checkAuthentication(JSON_ERROR_OUTPUT), function(req, res, next) {
+    res.json({
+        success: true,
+        commandList: []
+    });
+});
+
 module.exports = router;

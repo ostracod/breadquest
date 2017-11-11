@@ -110,3 +110,13 @@ input:not([type]), input:[type="text"] {
     background: #442222;
 }
 
+.statusBarContainer {
+    display: inline-block;
+    width: 300px;
+    border: 2px black solid;
+}
+
+.statusBar {
+    width: 0px;
+    height: 10px;
+}
