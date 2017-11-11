@@ -1,13 +1,14 @@
 
 var spritesImage;
+var spritesImageSize = 16;
 var spriteSize = 8;
+var spriteRenderSize = 64;
 var canvas;
 var context;
-var pixelSize = 6;
-var canvasPixelSize = 176;
-var spritesImageSize = 320;
+var canvasSpriteSize = 15;
+var canvasSize;
 var spritesImageHasLoaded = false;
-var framesPerSecond = 30;
+var framesPerSecond = 20;
 var canvasIsFocused = true;
 var shiftKeyIsHeld = false;
 var chatInputIsFocused = false;
@@ -326,9 +327,30 @@ function setAllInputIsFocusedAsFalse() {
     overlayChatInputIsFocused = false;
 }
 
+function computeCanvasSize() {
+    return canvasSpriteSize * spriteRenderSize;
+}
+
 function clearCanvas() {
     context.fillStyle = "#FFFFFF";
-    context.fillRect(0, 0, canvasPixelSize * pixelSize, canvasPixelSize * pixelSize);
+    context.fillRect(0, 0, canvasSize, canvasSize);
+}
+
+function drawSprite(pos, which) {
+    var tempClipX = (which % spritesImageSize) * spriteSize;
+    var tempClipY = Math.floor(which / spritesImageSize) * spriteSize;
+    context.imageSmoothingEnabled = false;
+    context.drawImage(
+        spritesImage,
+        tempClipX,
+        tempClipY,
+        spriteSize,
+        spriteSize,
+        pos.x * spriteRenderSize,
+        pos.y * spriteRenderSize,
+        spriteRenderSize,
+        spriteRenderSize
+    );
 }
 
 function keyDownEvent(event) {
@@ -435,8 +457,15 @@ function timerEvent() {
     }
     
     clearCanvas();
-    context.imageSmoothingEnabled = false;
-    context.drawImage(spritesImage, 0, 0, 1024, 1024);
+    var tempPos = new Pos(0, 0);
+    while (tempPos.y < canvasSpriteSize) {
+        drawSprite(tempPos, Math.floor(Math.random() * 2) + 6);
+        tempPos.x += 1;
+        if (tempPos.x >= canvasSpriteSize) {
+            tempPos.x = 0;
+            tempPos.y += 1;
+        }
+    }
     
 }
 
@@ -445,11 +474,12 @@ function initializeGame() {
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
     
-    canvas.width = canvasPixelSize * pixelSize;
-    canvas.height = canvasPixelSize * pixelSize;
-    canvas.style.width = canvasPixelSize * pixelSize / 2;
-    canvas.style.height = canvasPixelSize * pixelSize / 2;
-    canvas.style.border = Math.floor(pixelSize / 2) + "px #000000 solid";
+    canvasSize = computeCanvasSize();
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+    canvas.style.width = canvasSize / 2;
+    canvas.style.height = canvasSize / 2;
+    canvas.style.border = "3px #000000 solid";
     
     canvas.onclick = function(event) {
         overlayChatInput.style.display = "none";
