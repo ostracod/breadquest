@@ -55,12 +55,12 @@ ChunkUtils.prototype.getChunk = function(pos) {
         index += 1;
     }
     var output = this.loadChunk(pos);
-    this.chunkList.append(output);
+    this.chunkList.push(output);
     return output;
 }
 
 ChunkUtils.prototype.getChunkCountInFile = function(file) {
-    var tempStats = fs.statSync(file);
+    var tempStats = fs.fstatSync(file);
     return tempStats.size / chunkEntryLength;
 }
 
@@ -114,7 +114,7 @@ ChunkUtils.prototype.loadChunk = function(pos) {
         fs.read(tempFile, tempBuffer, 0, chunkDataLength, index * chunkEntryLength + chunkMetadataLength);
         output = new Chunk(pos.copy(), tempBuffer);
     } else {
-        output = this.createEmptyChunk();
+        output = this.createEmptyChunk(pos);
     }
     fs.closeSync(tempFile);
     return output;
@@ -128,7 +128,7 @@ ChunkUtils.prototype.getTiles = function(pos, size) {
         tempPos.set(pos);
         tempPos.add(tempOffset);
         var tempTile = this.getTile(tempPos);
-        output.append(tempTile);
+        output.push(tempTile);
         tempOffset.x += 1;
         if (tempOffset.x >= size) {
             tempOffset.x = 0;

@@ -66,8 +66,9 @@ GameUpdateRequest.prototype.respond = function(data) {
         var index = 0;
         while (index < tempCommandList.length) {
             var tempCommand = tempCommandList[index];
-            // TODO: Parse the command.
-            
+            if (tempCommand.commandName == "setTiles") {
+                performSetTilesCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -78,6 +79,16 @@ GameUpdateRequest.prototype.respond = function(data) {
     gameUpdateRequestDelay = 0.25 * framesPerSecond;
     isRequestingGameUpdate = false;
     AjaxRequest.prototype.respond.call(this, data);
+}
+
+function addGetEntitiesCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getTiles"
+    });
+}
+
+function performSetTilesCommand(command) {
+    console.log(command);
 }
 
 function Pos(x, y) {
@@ -481,6 +492,7 @@ function timerEvent() {
     if (!isRequestingGameUpdate) {
         gameUpdateRequestDelay -= 1;
         if (gameUpdateRequestDelay <= 0) {
+            addGetEntitiesCommand();
             new GameUpdateRequest();
         }
     }

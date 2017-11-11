@@ -3,7 +3,7 @@ var router = express.Router();
 var bcrypt = require("bcrypt");
 var pageUtils = require("utils/page.js");
 var accountUtils = require("utils/account.js");
-var chunkUtils = require("utils/game.js");
+var gameUtils = require("utils/game.js");
 var app = require("breadQuest");
 
 var checkAuthentication = pageUtils.checkAuthentication;
