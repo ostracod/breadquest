@@ -32,7 +32,7 @@ var colorSet;
 var tileBuffer = [];
 var tileBufferSize = 100;
 var blockStartTile = 129;
-var blockTileAmount = 9;
+var blockTileAmount = 8;
 var emptyTile = 128;
 
 var moduleList = [];

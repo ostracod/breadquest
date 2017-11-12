@@ -109,8 +109,12 @@ router.post("/createAccountAction", function(req, res, next) {
     var tempUsername = req.body.username;
     var tempPassword = req.body.password;
     var tempEmail = req.body.email;
+    var tempAvatar = parseInt(req.body.avatar);
     if (tempUsername.length > 30) {
-        res.json({success: false, message: "Your username must be at most 30 characters long."});
+        res.json({success: false, message: "Your username may not be longer than 30 characters."});
+    }
+    if (tempAvatar < 0 || tempAvatar > 7 || isNaN(tempAvatar)) {
+        res.json({success: false, message: "Invalid avatar."});
     }
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
@@ -134,6 +138,7 @@ router.post("/createAccountAction", function(req, res, next) {
                     username: tempUsername,
                     passwordHash: tempPasswordHash,
                     email: tempEmail,
+                    avatar: tempAvatar
                 }, function(error) {
                     accountUtils.releaseLock();
                     if (error) {
@@ -197,7 +202,21 @@ router.post("/changePasswordAction", checkAuthentication(JSON_ERROR_OUTPUT), fun
 });
 
 router.get("/menu", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, next) {
-    res.render("menu.html", {username: req.session.username, isAdmin: isAdmin(req.session.username)});
+    tempUsername = req.session.username;
+    accountUtils.acquireLock(function() {
+        accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
+            accountUtils.releaseLock();
+            if (error) {
+                reportDatabaseErrorWithPage(error, res);
+                return;
+            }
+            res.render("menu.html", {
+                username: tempUsername,
+                isAdmin: isAdmin(tempUsername),
+                avatar: result.avatar
+            });
+        });
+    });
 });
 
 router.get("/stopServer", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, next) {

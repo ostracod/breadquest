@@ -1,12 +1,32 @@
 <html>
     <head>
         <script src="javascript/global.js"></script>
+        <script src="javascript/pos.js"></script>
+        <script src="javascript/sprite.js"></script>
         <link type="text/css" rel="stylesheet" media="all" href="stylesheets/global.css" />
         <script>
 
+var avatarAmount = 8;
+var avatarCanvasList = [];
+var avatarCanvasSize = 96;
+var selectedAvatar = null;
 var isCreatingAccount = false;
 
-function CreateAccountRequest(username, password, email) {
+function selectAvatar(which) {
+    var index = 0;
+    while (index < avatarCanvasList.length) {
+        var tempCanvas = avatarCanvasList[index];
+        if (index == which) {
+            tempCanvas.style.border = "3px #000000 solid";
+        } else {
+            tempCanvas.style.border = "3px #FFFFFF solid";
+        }
+        index += 1;
+    }
+    selectedAvatar = which;
+}
+
+function CreateAccountRequest(username, password, email, avatar) {
     if (isCreatingAccount) {
         return;
     }
@@ -16,7 +36,8 @@ function CreateAccountRequest(username, password, email) {
     AjaxRequest.call(this, "createAccountAction", {}, {
         username: username,
         password: password,
-        email: email
+        email: email,
+        avatar: avatar
     });
 }
 setParentClass(CreateAccountRequest, AjaxRequest);
@@ -62,7 +83,11 @@ function processFields() {
         alert("Please enter a valid email address.");
         return;
     }
-    new CreateAccountRequest(tempUsername, tempPassword, tempEmail);
+    if (selectedAvatar === null) {
+        alert("Please select an avatar.");
+        return;
+    }
+    new CreateAccountRequest(tempUsername, tempPassword, tempEmail, selectedAvatar);
     return;
 }
 
@@ -94,6 +119,10 @@ function processFields() {
                         <td><input id="email" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" /></td>
                     </tr>
                     <tr>
+                        <td>Avatar:<br/>(Click One)</td>
+                        <td id="avatarList"></td>
+                    </tr>
+                    <tr>
                         <td></td>
                         <td><input type="submit" /></td>
                     </tr>
@@ -103,5 +132,39 @@ function processFields() {
             
             </p>
         </div>
+        <script>
+
+var tempContainer = document.getElementById("avatarList");
+var index = 0;
+while (index < avatarAmount) {
+    var tempCanvas = document.createElement("canvas");
+    tempCanvas.onclick = (function() {
+        var tempIndex = index;
+        return function() {
+            selectAvatar(tempIndex);
+        }
+    })();
+    tempCanvas.width = avatarCanvasSize;
+    tempCanvas.height = avatarCanvasSize;
+    tempCanvas.style.width = avatarCanvasSize / 2;
+    tempCanvas.style.height = avatarCanvasSize / 2;
+    tempCanvas.style.border = "3px #FFFFFF solid";
+    tempCanvas.style.margin = "8px";
+    tempContainer.appendChild(tempCanvas);
+    avatarCanvasList.push(tempCanvas);
+    index += 1;
+}
+
+initializeSpriteSheet(function () {
+    var index = 0;
+    while (index < avatarCanvasList.length) {
+        var tempCanvas = avatarCanvasList[index];
+        var tempContext = tempCanvas.getContext("2d");
+        drawSpriteOnContext(tempContext, new Pos(16, 16), 64, index);
+        index += 1;
+    }
+});
+
+        </script>
     </body>
 </html>
