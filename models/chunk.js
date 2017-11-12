@@ -5,9 +5,14 @@ var chunkTileLength = 3;
 var INCLUSION_HEIGHT_MAP_OFFSET = 0;
 var COLOR_HEIGHT_MAP_OFFSET = 1;
 var BLOCK_START_TILE = 129;
+var EMPTY_TILE = 128;
 var BLOCK_TILE_AMOUNT = 9;
 
-var TERRAIN_RESOLUTION = 16;
+var TERRAIN_INCLUSION_RESOLUTION = 8;
+var TERRAIN_COLOR_RESOLUTION = 16;
+var TERRAIN_INCLUSION_THRESHOLD = 128;
+var TERRAIN_INCLUSION_NOISE = 0.5;
+var TERRAIN_COLOR_NOISE = 0.2;
 
 function Chunk(pos, data) {
     this.pos = pos;
@@ -44,15 +49,20 @@ Chunk.prototype.hasGeneratedTiles = function() {
 }
 
 Chunk.prototype.generateTile = function(pos) {
+    var tempTile;
     var tempInclusionHeightMapValue = this.getHeightMapValue(pos, INCLUSION_HEIGHT_MAP_OFFSET);
-    var tempColorHeightMapValue = this.getHeightMapValue(pos, COLOR_HEIGHT_MAP_OFFSET);
-    var tempTile = BLOCK_START_TILE + Math.floor(((tempColorHeightMapValue - 1) / 255) * BLOCK_TILE_AMOUNT);
+    if (tempInclusionHeightMapValue < TERRAIN_INCLUSION_THRESHOLD) {
+        var tempColorHeightMapValue = this.getHeightMapValue(pos, COLOR_HEIGHT_MAP_OFFSET);
+        tempTile = BLOCK_START_TILE + Math.floor(((tempColorHeightMapValue - 1) / 255) * BLOCK_TILE_AMOUNT);
+    } else {
+        tempTile = EMPTY_TILE;
+    }
     this.setTile(pos, tempTile);
     return tempTile;
 }
 
-Chunk.prototype.getTerrainOffsetBoundary = function(offset) {
-    var output = TERRAIN_RESOLUTION;
+Chunk.prototype.getTerrainOffsetBoundary = function(offset, resolution) {
+    var output = resolution;
     while (output > 1) {
         if (offset % output == 0) {
             break;
@@ -66,11 +76,25 @@ Chunk.prototype.generateHeightMapValue = function(pos, offset) {
     var tempOffsetX = pos.x - this.pos.x;
     var tempOffsetY = pos.y - this.pos.y;
     var tempValue;
-    var tempBoundaryX = this.getTerrainOffsetBoundary(tempOffsetX);
-    var tempBoundaryY = this.getTerrainOffsetBoundary(tempOffsetY);
-    if (tempBoundaryX == TERRAIN_RESOLUTION && tempBoundaryY == TERRAIN_RESOLUTION) {
+    var tempResolution;
+    if (offset == INCLUSION_HEIGHT_MAP_OFFSET) {
+        tempResolution = TERRAIN_INCLUSION_RESOLUTION;
+    }
+    if (offset == COLOR_HEIGHT_MAP_OFFSET) {
+        tempResolution = TERRAIN_COLOR_RESOLUTION;
+    }
+    var tempBoundaryX = this.getTerrainOffsetBoundary(tempOffsetX, tempResolution);
+    var tempBoundaryY = this.getTerrainOffsetBoundary(tempOffsetY, tempResolution);
+    if (tempBoundaryX == tempResolution && tempBoundaryY == tempResolution) {
         tempValue = 1 + Math.random() * 255;
     } else {
+        var tempNoise;
+        if (offset == INCLUSION_HEIGHT_MAP_OFFSET) {
+            tempNoise = TERRAIN_INCLUSION_NOISE;
+        }
+        if (offset == COLOR_HEIGHT_MAP_OFFSET) {
+            tempNoise = TERRAIN_COLOR_NOISE;
+        }
         var tempOffsetSet;
         if (tempBoundaryX == tempBoundaryY) {
             tempOffsetSet = tempTerrainOffsetSet2;
@@ -99,6 +123,8 @@ Chunk.prototype.generateHeightMapValue = function(pos, offset) {
             index += 1;
         }
         tempValue = tempTotal / tempCount;
+        var tempNoiseRange = (tempScale / tempResolution) * 128 * tempNoise;
+        tempValue += tempNoiseRange - Math.random() * tempNoiseRange * 2;
     }
     tempValue = Math.round(tempValue);
     if (tempValue < 1) {
