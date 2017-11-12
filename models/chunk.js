@@ -17,6 +17,7 @@ var TERRAIN_COLOR_NOISE = 0.2;
 function Chunk(pos, data) {
     this.pos = pos;
     this.data = data;
+    this.isDirty = false;
 }
 
 module.exports = {
@@ -150,6 +151,7 @@ Chunk.prototype.generateAllTiles = function() {
             tempOffset.y += 1;
         }
     }
+    chunkUtils.persistAllChunks();
 }
 
 Chunk.prototype.convertPosToIndex = function(pos) {
@@ -169,6 +171,7 @@ Chunk.prototype.getTile = function(pos) {
 Chunk.prototype.setTile = function(pos, value) {
     var index = this.convertPosToIndex(pos);
     this.data[index] = value;
+    this.isDirty = true;
 }
 
 Chunk.prototype.getHeightMapValue = function(pos, offset) {
@@ -183,5 +186,6 @@ Chunk.prototype.getHeightMapValue = function(pos, offset) {
 Chunk.prototype.setHeightMapValue = function(pos, offset, value) {
     var index = this.convertPosToIndex(pos);
     this.data[index + 1 + offset] = value;
+    this.isDirty = true;
 }
 

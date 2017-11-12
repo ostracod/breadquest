@@ -74,9 +74,9 @@ ChunkUtils.prototype.findChunkInFile = function(file, pos) {
     var tempCount = this.getChunkCountInFile(file);
     var index = 0;
     while (index < tempCount) {
-        var tempBuffer = Buffer.alloc(chunkMetadataLength, 0);
-        fs.read(file, tempBuffer, 0, chunkMetadataLength, index * chunkEntryLength);
-        var tempJson = JSON.parse(buffer.toString("utf8"));
+        var tempBuffer = Buffer.alloc(chunkMetadataLength);
+        fs.readSync(file, tempBuffer, 0, chunkMetadataLength, index * chunkEntryLength);
+        var tempJson = JSON.parse(tempBuffer.toString("utf8"));
         var tempPos = createPosFromJson(tempJson.pos);
         if (tempPos.equals(pos)) {
             return {
@@ -93,12 +93,11 @@ ChunkUtils.prototype.findChunkInFile = function(file, pos) {
 }
 
 ChunkUtils.prototype.createEmptyChunk = function(pos) {
-    var tempBuffer = Buffer.alloc(chunkDataLength, 0);
+    var tempBuffer = Buffer.alloc(chunkDataLength);
     return new Chunk(pos.copy(), tempBuffer);
 }
 
-// pos must be aligned to chunk boundaries.
-ChunkUtils.prototype.loadChunk = function(pos) {
+ChunkUtils.prototype.getFile = function(pos) {
     var tempPos = this.convertPosToFilePos(pos);
     var tempName = tempPos.x + "_" + tempPos.y + ".dat";
     var tempPath = pathUtils.join(chunksDirectoryPath, tempName);
@@ -106,12 +105,17 @@ ChunkUtils.prototype.loadChunk = function(pos) {
         var tempFile = fs.openSync(tempPath, "w");
         fs.closeSync(tempFile);
     }
-    var tempFile = fs.openSync(tempPath, "r+");
+    return fs.openSync(tempPath, "r+");
+}
+
+// pos must be aligned to chunk boundaries.
+ChunkUtils.prototype.loadChunk = function(pos) {
+    var tempFile = this.getFile(pos);
     var tempResult = this.findChunkInFile(tempFile, pos);
     var output;
     if (tempResult.index >= 0) {
         var tempBuffer = Buffer.alloc(chunkDataLength);
-        fs.read(tempFile, tempBuffer, 0, chunkDataLength, index * chunkEntryLength + chunkMetadataLength);
+        fs.readSync(tempFile, tempBuffer, 0, chunkDataLength, tempResult.index * chunkEntryLength + chunkMetadataLength);
         output = new Chunk(pos.copy(), tempBuffer);
     } else {
         output = this.createEmptyChunk(pos);
@@ -160,4 +164,44 @@ ChunkUtils.prototype.setHeightMapValue = function(pos, offset, value) {
     var tempPos = this.convertPosToChunkPos(pos);
     var tempChunk = this.getChunk(tempPos);
     tempChunk.setHeightMapValue(pos, offset, value);
+}
+
+
+ChunkUtils.prototype.createEntryMetadataBuffer = function(metadata) {
+    var tempText = JSON.stringify(metadata);
+    var tempBuffer = Buffer.from(tempText, "utf8");
+    var output = Buffer.alloc(chunkMetadataLength, 32);
+    tempBuffer.copy(output);
+    return output;
+}
+
+ChunkUtils.prototype.persistChunk = function(chunk) {
+    var tempFile = this.getFile(chunk.pos);
+    var tempResult = this.findChunkInFile(tempFile, chunk.pos);
+    var index;
+    if (tempResult.index >= 0) {
+        index = tempResult.index;
+    } else {
+        index = this.getChunkCountInFile(tempFile);
+    }
+    var tempMetadata = {
+        pos: chunk.pos.toJson()
+    };
+    var tempBuffer = this.createEntryMetadataBuffer(tempMetadata);
+    var tempPosition = index * chunkEntryLength;
+    fs.writeSync(tempFile, tempBuffer, 0, chunkMetadataLength, tempPosition);
+    fs.writeSync(tempFile, chunk.data, 0, chunkDataLength, tempPosition + chunkMetadataLength);
+    fs.closeSync(tempFile);
+    chunk.isDirty = false;
+}
+
+ChunkUtils.prototype.persistAllChunks = function() {
+    var index = 0;
+    while (index < this.chunkList.length) {
+        var tempChunk = this.chunkList[index];
+        if (tempChunk.isDirty) {
+            this.persistChunk(tempChunk);
+        }
+        index += 1;
+    }
 }

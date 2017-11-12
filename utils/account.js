@@ -32,11 +32,12 @@ AccountUtils.prototype.releaseLock = function() {
     accountsFileLock = false;
 }
 
-AccountUtils.prototype.padWithSpaces = function(text) {
-    while (text.length < accountEntryLength) {
-        text += " ";
-    }
-    return text;
+AccountUtils.prototype.createEntryBuffer = function(account) {
+    var tempText = JSON.stringify(account);
+    var tempBuffer = Buffer.from(tempText, "utf8");
+    var output = Buffer.alloc(accountEntryLength, 32);
+    tempBuffer.copy(output);
+    return output;
 }
 
 AccountUtils.prototype.getAccountCount = function() {
@@ -53,7 +54,7 @@ AccountUtils.prototype.getAccount = function(index, done) {
         console.log("Missing lock!");
         return;
     }
-    var tempBuffer = Buffer.alloc(accountEntryLength, 0);
+    var tempBuffer = Buffer.alloc(accountEntryLength);
     fs.read(accountsFile, tempBuffer, 0, accountEntryLength, index * accountEntryLength, function(error, count, buffer) {
         if (error) {
             done(error, null);
@@ -68,8 +69,7 @@ AccountUtils.prototype.setAccount = function(index, account, done) {
         console.log("Missing lock!");
         return;
     }
-    var tempText = this.padWithSpaces(JSON.stringify(account));
-    var tempBuffer = Buffer.from(tempText, "utf8");
+    var tempBuffer = this.createEntryBuffer(account);
     fs.write(accountsFile, tempBuffer, 0, accountEntryLength, index * accountEntryLength, function(error, count, buffer) {
         if (error) {
             done(error);

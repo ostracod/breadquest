@@ -108,8 +108,18 @@ function performGetTilesCommand(command, player, commandList) {
     addSetTilesCommand(tempPos, tempSize, tempTileList, commandList);
 }
 
-GameUtils.prototype.stopGame = function(done) {
-    hasStopped = true;
-    // TODO: Persist everything.
+GameUtils.prototype.persistEverything = function(done) {
+    chunkUtils.persistAllChunks();
     done();
 }
+
+GameUtils.prototype.stopGame = function(done) {
+    hasStopped = true;
+    this.persistEverything(done);
+}
+
+setInterval(function() {
+    if (!hasStopped) {
+        gameUtils.persistEverything(function() {});
+    }
+}, 60 * 1000);
