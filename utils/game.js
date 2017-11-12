@@ -11,12 +11,32 @@ var tempResource = require("models/Pos");
 var Pos = tempResource.Pos;
 var createPosFromJson = tempResource.createPosFromJson;
 
+var entityList = require("models/Entity").entityList;
+var Player = require("models/Player").Player;
+
 var classUtils = require("utils/class.js");
 var accountUtils = require("utils/account.js");
 var chunkUtils = require("utils/chunk.js");
 
+var framesPerSecond = 20;
 var hasStopped = false;
 var maximumPlayerCount = 15;
+var persistDelay = 60 * framesPerSecond;
+var isPersistingEverything = false;
+
+GameUtils.prototype.getPlayerByUsername = function(username) {
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (classUtils.isInstanceOf(tempEntity, Player)) {
+            if (tempEntity.username == username) {
+                return tempEntity;
+            }
+        }
+        index += 1;
+    }
+    return null;
+}
 
 GameUtils.prototype.performUpdate = function(username, commandList, done) {
     if (hasStopped) {
@@ -30,13 +50,17 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
     var tempCommandList;
     var index = 0;
     function startProcessingCommands() {
-        //var tempDate = new Date();
-        //tempPlayer.lastActivityTime = tempDate.getTime();
+        var tempDate = new Date();
+        tempPlayer.lastActivityTime = tempDate.getTime();
         tempCommandList = [];
         index = 0;
         processNextCommand();
     }
     function processNextCommand() {
+        if (isPersistingEverything) {
+            setTimeout(processNextCommand, 100);
+            return;
+        }
         while (true) {
             if (index >= commandList.length) {
                 done({
@@ -52,10 +76,8 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             }
         }
     }
-    tempPlayer = null;
-    //tempPlayer = gameUtils.getPlayerByUsername(username);
-    //if (tempPlayer === null) {
-    if (false) {
+    tempPlayer = gameUtils.getPlayerByUsername(username);
+    if (tempPlayer === null) {
         var tempCount = 0;
         var index = 0;
         while (index < entityList.length) {
@@ -79,7 +101,7 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
                     reportDatabaseErrorWithJson(error, res);
                     return;
                 }
-                tempPlayer = new Player(new Pos(0, 0), username);
+                tempPlayer = new Player(result);
                 startProcessingCommands();
             });
         });
@@ -109,8 +131,27 @@ function performGetTilesCommand(command, player, commandList) {
 }
 
 GameUtils.prototype.persistEverything = function(done) {
+    console.log("Saving world state...");
+    isPersistingEverything = true;
     chunkUtils.persistAllChunks();
-    done();
+    var index = 0;
+    function persistNextEntity() {
+        while (true) {
+            if (index >= entityList.length) {
+                isPersistingEverything = false;
+                console.log("Saved world state.");
+                done();
+                return;
+            }
+            var tempEntity = entityList[index];
+            index += 1;
+            if (classUtils.isInstanceOf(tempEntity, Player)) {
+                tempEntity.persist(persistNextEntity);
+                return;
+            }
+        }
+    }
+    persistNextEntity();
 }
 
 GameUtils.prototype.stopGame = function(done) {
@@ -118,8 +159,23 @@ GameUtils.prototype.stopGame = function(done) {
     this.persistEverything(done);
 }
 
-setInterval(function() {
-    if (!hasStopped) {
-        gameUtils.persistEverything(function() {});
+function gameTimerEvent() {
+    if (hasStopped || isPersistingEverything) {
+        return;
     }
-}, 60 * 1000);
+    var index = entityList.length - 1;
+    while (index >= 0) {
+        var tempEntity = entityList[index];
+        tempEntity.tick();
+        index -= 1;
+    }
+    persistDelay -= 1;
+    if (persistDelay <= 0) {
+        persistDelay = 60 * framesPerSecond;
+        gameUtils.persistEverything(function() {
+            // Do nothing.
+        });
+    }
+}
+
+setInterval(gameTimerEvent, 1000 / framesPerSecond);
