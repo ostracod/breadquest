@@ -2,12 +2,10 @@
 var spritesImage;
 var spritesImageSize = 16;
 var spriteSize = 8;
-//var spriteRenderSize = 64;
-var spriteRenderSize = 32;
+var spriteRenderSize;
 var canvas;
 var context;
-//var canvasSpriteSize = 15;
-var canvasSpriteSize = 30;
+var canvasSpriteSize;
 var canvasSize;
 var spritesImageHasLoaded = false;
 var framesPerSecond = 20;
@@ -458,6 +456,17 @@ function drawTile(pos, which) {
     }
 }
 
+function setZoom(which) {
+    if (which == 0) {
+        spriteRenderSize = 32;
+        canvasSpriteSize = 30;
+    }
+    if (which == 1) {
+        spriteRenderSize = 64;
+        canvasSpriteSize = 15;
+    }
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -502,6 +511,12 @@ function keyDownEvent(event) {
         }
         if (keyCode == 40 || keyCode == 83) {
             cameraPos.y += 1;
+        }
+        if (keyCode == 189 || keyCode == 173) {
+            setZoom(0);
+        }
+        if ((keyCode == 187 || keyCode == 61) && shiftKeyIsHeld) {
+            setZoom(1);
         }
         if (keyCode >= 37 && keyCode <= 40) {
             return false;
@@ -594,6 +609,8 @@ function timerEvent() {
 }
 
 function initializeGame() {
+    
+    setZoom(1);
     
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
