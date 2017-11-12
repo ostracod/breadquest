@@ -1,13 +1,9 @@
 
-var spritesImage;
-var spritesImageSize = 16;
-var spriteSize = 8;
 var spriteRenderSize;
 var canvas;
 var context;
 var canvasSpriteSize;
 var canvasSize;
-var spritesImageHasLoaded = false;
 var framesPerSecond = 20;
 var canvasIsFocused = true;
 var shiftKeyIsHeld = false;
@@ -23,7 +19,7 @@ var overlayChatMessageList = [];
 var overlayChatInputIsVisible = false;
 var barList = [];
 var statusBarMaximumWidth = 300;
-var cameraPos;
+var cameraPos = new Pos(0, 0);
 var gameUpdateCommandList = []
 var gameUpdateRequestDelay = 0;
 var lastGameUpdateFrameNumber = null;
@@ -143,62 +139,6 @@ function setTileBufferValue(pos, value) {
     var index = convertPosToTileBufferIndex(pos);
     tileBuffer[index] = value;
 }
-
-function Pos(x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-Pos.prototype.set = function(pos) {
-    this.x = pos.x;
-    this.y = pos.y;
-}
-
-Pos.prototype.add = function(pos) {
-    this.x += pos.x;
-    this.y += pos.y;
-}
-
-Pos.prototype.subtract = function(pos) {
-    this.x -= pos.x;
-    this.y -= pos.y;
-}
-
-Pos.prototype.scale = function(number) {
-    this.x *= number;
-    this.y *= number;
-}
-
-Pos.prototype.copy = function() {
-    return new Pos(this.x, this.y);
-}
-
-Pos.prototype.equals = function(pos) {
-    return (this.x == pos.x && this.y == pos.y);
-}
-
-Pos.prototype.getOrthogonalDistance = function(pos) {
-    var tempDistanceX = Math.abs(this.x - pos.x);
-    var tempDistanceY = Math.abs(this.y - pos.y);
-    if (tempDistanceX > tempDistanceY) {
-        return tempDistanceX;
-    } else {
-        return tempDistanceY;
-    }
-}
-
-Pos.prototype.toJson = function() {
-    return {
-        x: this.x,
-        y: this.y
-    }
-}
-
-function createPosFromJson(data) {
-    return new Pos(data.x, data.y);
-}
-
-cameraPos = new Pos(0, 0);
 
 function Color(r, g, b) {
     this.r = r;
@@ -415,19 +355,13 @@ function clearCanvas() {
 }
 
 function drawSprite(pos, which) {
-    var tempClipX = (which % spritesImageSize) * spriteSize;
-    var tempClipY = Math.floor(which / spritesImageSize) * spriteSize;
-    context.imageSmoothingEnabled = false;
-    context.drawImage(
-        spritesImage,
-        tempClipX,
-        tempClipY,
-        spriteSize,
-        spriteSize,
-        pos.x * spriteRenderSize,
-        pos.y * spriteRenderSize,
+    var tempPos = pos.copy();
+    tempPos.scale(spriteRenderSize);
+    drawSpriteOnContext(
+        context,
+        tempPos,
         spriteRenderSize,
-        spriteRenderSize
+        which
     );
 }
 
@@ -634,11 +568,7 @@ function initializeGame() {
     overlayChatInput = document.getElementById("overlayChatInput");
     overlayChatOutput = document.getElementById("overlayChatOutput");
     
-    spritesImage = new Image();
-    spritesImage.onload = function() {
-        spritesImageHasLoaded = true;
-    }
-    spritesImage.src = "/images/sprites.png";
+    initializeSpriteSheet(function() {});
     
     var tempModule = new Module("stats");
     tempModule.show();
