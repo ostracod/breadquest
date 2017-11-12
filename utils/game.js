@@ -99,8 +99,8 @@ function addSetTilesCommand(pos, size, tileList, commandList) {
 }
 
 function performGetTilesCommand(command, player, commandList) {
-    var tempPos = new Pos(0, 0);
-    var tempSize = 10;
+    var tempPos = createPosFromJson(command.pos);
+    var tempSize = command.size;
     if (tempSize > 50) {
         return;
     }

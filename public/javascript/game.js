@@ -35,6 +35,8 @@ var lastActivityTime = 0;
 var colorSet;
 var tileBuffer = [];
 var tileBufferSize = 100;
+var blockStartTile = 129;
+var blockTileAmount = 9;
 
 var moduleList = [];
 
@@ -85,7 +87,9 @@ GameUpdateRequest.prototype.respond = function(data) {
 
 function addGetEntitiesCommand() {
     gameUpdateCommandList.push({
-        commandName: "getTiles"
+        commandName: "getTiles",
+        pos: cameraPos.toJson(),
+        size: canvasSpriteSize
     });
 }
 
@@ -258,7 +262,8 @@ colorSet = [
     new Color(64, 64, 255),
     new Color(192, 0, 192),
     new Color(128, 128, 128),
-    new Color(0, 0, 0)
+    new Color(0, 0, 0),
+    new Color(64, 64, 64)
 ];
 
 function OverlayChatMessage(playerName, text) {
@@ -441,6 +446,15 @@ function drawSquare(pos, colorIndex, isSmall) {
     context.fillRect(tempPosX, tempPosY, tempSize, tempSize);
 }
 
+function drawTile(pos, which) {
+    if (which == 0) {
+        drawSquare(pos, 9, false);
+    }
+    if (which >= blockStartTile && which < blockStartTile + blockTileAmount) {
+        drawSquare(pos, which - blockStartTile, false);
+    }
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -474,7 +488,18 @@ function keyDownEvent(event) {
             overlayChatInput.focus();
             overlayChatInputIsFocused = true;
         }
-        
+        if (keyCode == 37 || keyCode == 65) {
+            cameraPos.x -= 1;
+        }
+        if (keyCode == 39 || keyCode == 68) {
+            cameraPos.x += 1;
+        }
+        if (keyCode == 38 || keyCode == 87) {
+            cameraPos.y -= 1;
+        }
+        if (keyCode == 40 || keyCode == 83) {
+            cameraPos.y += 1;
+        }
     }
     if (keyCode == 16) {
         shiftKeyIsHeld = true;
@@ -552,9 +577,7 @@ function timerEvent() {
         tempPos.set(cameraPos);
         tempPos.add(tempOffset);
         var tempTile = getTileBufferValue(tempPos);
-        if (tempTile == 129) {
-            drawSquare(tempPos, 0, false);
-        }
+        drawTile(tempOffset, tempTile);
         tempOffset.x += 1;
         if (tempOffset.x >= canvasSpriteSize) {
             tempOffset.x = 0;
