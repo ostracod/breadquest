@@ -2,10 +2,12 @@
 var spritesImage;
 var spritesImageSize = 16;
 var spriteSize = 8;
-var spriteRenderSize = 64;
+//var spriteRenderSize = 64;
+var spriteRenderSize = 32;
 var canvas;
 var context;
-var canvasSpriteSize = 15;
+//var canvasSpriteSize = 15;
+var canvasSpriteSize = 30;
 var canvasSize;
 var spritesImageHasLoaded = false;
 var framesPerSecond = 20;
@@ -499,6 +501,9 @@ function keyDownEvent(event) {
         }
         if (keyCode == 40 || keyCode == 83) {
             cameraPos.y += 1;
+        }
+        if (keyCode >= 37 && keyCode <= 40) {
+            return false;
         }
     }
     if (keyCode == 16) {
