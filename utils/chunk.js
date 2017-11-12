@@ -144,3 +144,20 @@ ChunkUtils.prototype.getTile = function(pos) {
     return tempChunk.getTile(pos);
 }
 
+ChunkUtils.prototype.setTile = function(pos, value) {
+    var tempPos = this.convertPosToChunkPos(pos);
+    var tempChunk = this.getChunk(tempPos);
+    tempChunk.setTile(pos, value);
+}
+
+ChunkUtils.prototype.getHeightMapValue = function(pos, offset) {
+    var tempPos = this.convertPosToChunkPos(pos);
+    var tempChunk = this.getChunk(tempPos);
+    return tempChunk.getHeightMapValue(pos, offset);
+}
+
+ChunkUtils.prototype.setHeightMapValue = function(pos, offset, value) {
+    var tempPos = this.convertPosToChunkPos(pos);
+    var tempChunk = this.getChunk(tempPos);
+    tempChunk.setHeightMapValue(pos, offset, value);
+}
