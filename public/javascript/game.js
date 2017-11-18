@@ -31,9 +31,11 @@ var lastActivityTime = 0;
 var colorSet;
 var tileBuffer = [];
 var tileBufferSize = 100;
+var emptyTile = 128;
 var blockStartTile = 129;
 var blockTileAmount = 8;
-var emptyTile = 128;
+var trailStartTile = 137;
+var trailTileAmount = 8;
 var entityList = [];
 var localPlayer;
 var playerWalkOffsetList = [
@@ -344,6 +346,7 @@ Color.prototype.toString = function() {
 }
 
 colorSet = [
+    // Block colors.
     new Color(255, 64, 64),
     new Color(255, 128, 0),
     new Color(192, 192, 64),
@@ -352,8 +355,20 @@ colorSet = [
     new Color(64, 64, 255),
     new Color(192, 0, 192),
     new Color(128, 128, 128),
+    
+    // Misc colors.
     new Color(0, 0, 0),
-    new Color(64, 64, 64)
+    new Color(64, 64, 64),
+    
+    // Trail colors.
+    new Color(255, 128, 128),
+    new Color(255, 192, 64),
+    new Color(255, 255, 128),
+    new Color(64, 255, 64),
+    new Color(64, 255, 255),
+    new Color(128, 128, 255),
+    new Color(255, 64, 255),
+    new Color(192, 192, 192)
 ];
 
 function OverlayChatMessage(playerName, text) {
@@ -536,6 +551,9 @@ function drawTile(pos, which) {
     }
     if (which >= blockStartTile && which < blockStartTile + blockTileAmount) {
         drawSquare(pos, which - blockStartTile, false);
+    }
+    if (which >= trailStartTile && which < trailStartTile + trailTileAmount) {
+        drawSquare(pos, which - trailStartTile + 10, true);
     }
 }
 

@@ -10,6 +10,7 @@ var chunkUtils = require("utils/chunk");
 var tempResource = require("models/Chunk");
 var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
 var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
+var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
 
 var playerWalkOffsetList = [
     new Pos(0, -1),
@@ -87,6 +88,7 @@ Player.prototype.walk = function(direction) {
         return;
     }
     this.pos.set(tempPos);
+    chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
 }
 
 module.exports = {

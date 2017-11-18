@@ -7,6 +7,8 @@ var COLOR_HEIGHT_MAP_OFFSET = 1;
 var EMPTY_TILE = 128;
 var BLOCK_START_TILE = 129;
 var BLOCK_TILE_AMOUNT = 8;
+var TRAIL_START_TILE = 137;
+var TRAIL_TILE_AMOUNT = 8;
 
 var TERRAIN_INCLUSION_RESOLUTION = 8;
 var TERRAIN_COLOR_RESOLUTION = 16;
@@ -27,7 +29,9 @@ module.exports = {
     COLOR_HEIGHT_MAP_OFFSET: COLOR_HEIGHT_MAP_OFFSET,
     INCLUSION_HEIGHT_MAP_OFFSET: INCLUSION_HEIGHT_MAP_OFFSET,
     BLOCK_START_TILE: BLOCK_START_TILE,
-    BLOCK_TILE_AMOUNT: BLOCK_TILE_AMOUNT
+    BLOCK_TILE_AMOUNT: BLOCK_TILE_AMOUNT,
+    TRAIL_START_TILE: TRAIL_START_TILE,
+    TRAIL_TILE_AMOUNT: TRAIL_TILE_AMOUNT
 }
 
 var Pos = require("models/Pos").Pos;
@@ -57,6 +61,12 @@ Chunk.prototype.generateTile = function(pos) {
     if (tempInclusionHeightMapValue < TERRAIN_INCLUSION_THRESHOLD) {
         var tempColorHeightMapValue = this.getHeightMapValue(pos, COLOR_HEIGHT_MAP_OFFSET);
         tempTile = BLOCK_START_TILE + Math.floor(((tempColorHeightMapValue - 1) / 255) * BLOCK_TILE_AMOUNT);
+        if (tempTile >= BLOCK_START_TILE + BLOCK_TILE_AMOUNT) {
+            tempTile = BLOCK_START_TILE + BLOCK_TILE_AMOUNT - 1;
+        }
+        if (tempTile < BLOCK_START_TILE) {
+            tempTile = BLOCK_START_TILE;
+        }
     } else {
         tempTile = EMPTY_TILE;
     }
