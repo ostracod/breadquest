@@ -36,6 +36,12 @@ var blockTileAmount = 8;
 var emptyTile = 128;
 var entityList = [];
 var localPlayer;
+var playerWalkOffsetList = [
+    new Pos(0, -1),
+    new Pos(1, 0),
+    new Pos(0, 1),
+    new Pos(-1, 0),
+];
 
 var moduleList = [];
 
@@ -182,6 +188,11 @@ Player.prototype.draw = function() {
     var tempPos = this.getDisplayPos().copy();
     drawSprite(tempPos, 0 + this.avatar)
     //drawCenteredText(...);
+}
+
+Player.prototype.walk = function(direction) {
+    var tempOffset = playerWalkOffsetList[direction];
+    this.pos.add(tempOffset);
 }
 
 function resetTileBuffer() {
@@ -507,16 +518,16 @@ function keyDownEvent(event) {
             overlayChatInputIsFocused = true;
         }
         if (keyCode == 37 || keyCode == 65) {
-            cameraPos.x -= 1;
+            localPlayer.walk(3);
         }
         if (keyCode == 39 || keyCode == 68) {
-            cameraPos.x += 1;
+            localPlayer.walk(1);
         }
         if (keyCode == 38 || keyCode == 87) {
-            cameraPos.y -= 1;
+            localPlayer.walk(0);
         }
         if (keyCode == 40 || keyCode == 83) {
-            cameraPos.y += 1;
+            localPlayer.walk(2);
         }
         if (keyCode == 189 || keyCode == 173) {
             setZoom(0);
@@ -603,6 +614,10 @@ function timerEvent() {
         tempEntity.tick();
         index -= 1;
     }
+    cameraPos.set(localPlayer.pos);
+    var tempOffset = Math.floor(canvasSpriteSize / 2);
+    cameraPos.x -= tempOffset;
+    cameraPos.y -= tempOffset;
     
     clearCanvas();
     var tempPos = new Pos(0, 0);
