@@ -344,10 +344,15 @@ Player.prototype.draw = function() {
     }
 }
 
-Player.prototype.walk = function(direction) {
+Player.prototype.getPosInWalkDirection = function(direction) {
     var tempOffset = playerWalkOffsetList[direction];
-    var tempPos = this.pos.copy();
-    tempPos.add(tempOffset);
+    var output = this.pos.copy();
+    output.add(tempOffset);
+    return output;
+}
+
+Player.prototype.walk = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = getTileBufferValue(tempPos);
     if ((tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount)
             || tempTile == 0) {
@@ -355,6 +360,68 @@ Player.prototype.walk = function(direction) {
     }
     this.pos.set(tempPos);
     addWalkCommand(direction);
+}
+
+Player.prototype.placeTile = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
+    // TODO: Implement.
+    console.log("Place " + tempPos.toString());
+}
+
+Player.prototype.removeTile = function(direction) {
+    var tempCrack = getLocalPlayerCrack();
+    if (tempCrack !== null) {
+        return;
+    }
+    var tempPos = this.getPosInWalkDirection(direction);
+    new Crack(-1, tempPos, localPlayer.username);
+    // TODO: Implement the rest.
+    console.log("Remove " + tempPos.toString());
+}
+
+Player.prototype.placeOrRemoveTile = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
+    var tempTile = getTileBufferValue(tempPos);
+    if (tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount) {
+        this.removeTile(direction);
+    }
+    if (tempTile == emptyTile
+            || (tempTile >= trailStartTile && tempTile < trailStartTile + trailTileAmount)) {
+        this.placeTile(direction);
+    }
+}
+
+Player.prototype.performActionInDirection = function(direction) {
+    if (shiftKeyIsHeld) {
+        this.placeOrRemoveTile(direction);
+    } else {
+        this.walk(direction);
+    }
+}
+
+function Crack(id, pos, username) {
+    Entity.call(this, id, pos);
+    this.username = username;
+}
+setParentClass(Crack, Entity);
+
+Crack.prototype.draw = function() {
+    Entity.prototype.draw.call(this);
+    drawSprite(this.getDisplayPos(), 64);
+}
+
+function getLocalPlayerCrack() {
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (isInstanceOf(tempEntity, Crack)) {
+            if (tempEntity.username == localPlayer.username) {
+                return tempEntity;
+            }
+        }
+        index += 1;
+    }
+    return null;
 }
 
 function resetTileBuffer() {
@@ -713,16 +780,16 @@ function keyDownEvent(event) {
             overlayChatInputIsFocused = true;
         }
         if (keyCode == 37 || keyCode == 65) {
-            localPlayer.walk(3);
+            localPlayer.performActionInDirection(3);
         }
         if (keyCode == 39 || keyCode == 68) {
-            localPlayer.walk(1);
+            localPlayer.performActionInDirection(1);
         }
         if (keyCode == 38 || keyCode == 87) {
-            localPlayer.walk(0);
+            localPlayer.performActionInDirection(0);
         }
         if (keyCode == 40 || keyCode == 83) {
-            localPlayer.walk(2);
+            localPlayer.performActionInDirection(2);
         }
         if (keyCode == 189 || keyCode == 173) {
             setZoom(0);

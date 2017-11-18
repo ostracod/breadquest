@@ -42,6 +42,10 @@ Pos.prototype.getOrthogonalDistance = function(pos) {
     }
 }
 
+Pos.prototype.toString = function() {
+    return "(" + this.x + ", " + this.y + ")";
+}
+
 Pos.prototype.toJson = function() {
     return {
         x: this.x,
