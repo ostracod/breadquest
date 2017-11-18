@@ -84,6 +84,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "assertPos") {
                 performAssertPosCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "getEntities") {
+                performGetEntitiesCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -146,6 +149,19 @@ function addSetLocalPlayerPosCommand(player, commandList) {
     });
 }
 
+function addRemoveAllEntitiesCommand(commandList) {
+    commandList.push({
+        commandName: "removeAllEntities"
+    });
+}
+
+function addAddEntityCommand(entity, commandList) {
+    commandList.push({
+        commandName: "addEntity",
+        entityInfo: entity.getClientInfo()
+    });
+}
+
 function performStartPlayingCommand(command, player, commandList, done) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
@@ -178,6 +194,22 @@ function performAssertPosCommand(command, player, commandList) {
     var tempPos = createPosFromJson(command.pos);
     if (!player.pos.equals(tempPos)) {
         addSetLocalPlayerPosCommand(player, commandList);
+    }
+}
+
+function performGetEntitiesCommand(command, player, commandList) {
+    addRemoveAllEntitiesCommand(commandList);
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        var tempRadius = 40;
+        if (tempEntity.pos.x > player.pos.x - tempRadius && tempEntity.pos.x < player.pos.x + tempRadius
+                && tempEntity.pos.y > player.pos.y - tempRadius && tempEntity.pos.y < player.pos.y + tempRadius) {
+            if (tempEntity != player) {
+                addAddEntityCommand(tempEntity, commandList);
+            }
+        }
+        index += 1;
     }
 }
 

@@ -71,6 +71,9 @@ Player.prototype.getClientInfo = function() {
         id: this.id,
         pos: this.pos.toJson(),
         username: this.username,
+        avatar: this.avatar,
+        // TODO: Populate this.
+        breadCount: 0
     }
 }
 

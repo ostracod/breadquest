@@ -85,6 +85,12 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "setLocalPlayerPos") {
                 performSetLocalPlayerPosCommand(tempCommand);
             }
+            if (tempCommand.commandName == "removeAllEntities") {
+                performRemoveAllEntitiesCommand(tempCommand);
+            }
+            if (tempCommand.commandName == "addEntity") {
+                performAddEntityCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -125,6 +131,12 @@ function addAssertPosCommand() {
     });
 }
 
+function addGetEntitiesCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getEntities"
+    });
+}
+
 function performSetLocalPlayerInfoCommand(command) {
     localPlayer.username = command.username;
     localPlayer.avatar = command.avatar;
@@ -155,6 +167,25 @@ function performSetTilesCommand(command) {
 
 function performSetLocalPlayerPosCommand(command) {
     localPlayer.pos = createPosFromJson(command.pos);
+}
+
+function performRemoveAllEntitiesCommand(command) {
+    entityList = [localPlayer];
+}
+
+function performAddEntityCommand(command) {
+    var tempEntityInfo = command.entityInfo;
+    var tempClassName = tempEntityInfo.className;
+    if (tempClassName == "Player") {
+        var tempPos = createPosFromJson(tempEntityInfo.pos);
+        new Player(
+            tempEntityInfo.id,
+            tempPos,
+            tempEntityInfo.username,
+            tempEntityInfo.avatar,
+            tempEntityInfo.breadCount
+        );
+    }
 }
 
 function Entity(id, pos) {
@@ -641,6 +672,7 @@ function timerEvent() {
         gameUpdateRequestDelay -= 1;
         if (gameUpdateRequestDelay <= 0) {
             addAssertPosCommand();
+            addGetEntitiesCommand();
             addGetTilesCommand();
             new GameUpdateRequest();
         }
