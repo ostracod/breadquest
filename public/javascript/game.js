@@ -192,7 +192,14 @@ Player.prototype.draw = function() {
 
 Player.prototype.walk = function(direction) {
     var tempOffset = playerWalkOffsetList[direction];
-    this.pos.add(tempOffset);
+    var tempPos = this.pos.copy();
+    tempPos.add(tempOffset);
+    var tempTile = getTileBufferValue(tempPos);
+    if ((tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount)
+            || tempTile == 0) {
+        return;
+    }
+    this.pos.set(tempPos);
 }
 
 function resetTileBuffer() {
