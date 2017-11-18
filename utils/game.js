@@ -7,16 +7,17 @@ var gameUtils = new GameUtils();
 
 module.exports = gameUtils;
 
-var tempResource = require("models/Pos");
+var tempResource = require("models/pos");
 var Pos = tempResource.Pos;
 var createPosFromJson = tempResource.createPosFromJson;
 
-var tempResource = require("models/ChatMessage");
+var tempResource = require("models/chatMessage");
 var ChatMessage = tempResource.ChatMessage;
 var chatMessageList = tempResource.chatMessageList;
 
-var entityList = require("models/Entity").entityList;
-var Player = require("models/Player").Player;
+var entityList = require("models/entity").entityList;
+var Player = require("models/player").Player;
+var Crack = require("models/crack").Crack;
 
 var classUtils = require("utils/class.js");
 var accountUtils = require("utils/account.js");
@@ -33,6 +34,20 @@ GameUtils.prototype.getPlayerByUsername = function(username) {
     while (index < entityList.length) {
         var tempEntity = entityList[index];
         if (classUtils.isInstanceOf(tempEntity, Player)) {
+            if (tempEntity.username == username) {
+                return tempEntity;
+            }
+        }
+        index += 1;
+    }
+    return null;
+}
+
+GameUtils.prototype.getCrackByUsername = function(username) {
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (classUtils.isInstanceOf(tempEntity, Crack)) {
             if (tempEntity.username == username) {
                 return tempEntity;
             }
@@ -99,6 +114,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             }
             if (tempCommand.commandName == "getOnlinePlayers") {
                 performGetOnlinePlayersCommand(tempCommand, tempPlayer, tempCommandList);
+            }
+            if (tempCommand.commandName == "removeTile") {
+                performRemoveTileCommand(tempCommand, tempPlayer, tempCommandList);
             }
         }
     }
@@ -236,12 +254,22 @@ function performGetEntitiesCommand(command, player, commandList) {
     var index = 0;
     while (index < entityList.length) {
         var tempEntity = entityList[index];
-        var tempRadius = 40;
-        if (tempEntity.pos.x > player.pos.x - tempRadius && tempEntity.pos.x < player.pos.x + tempRadius
-                && tempEntity.pos.y > player.pos.y - tempRadius && tempEntity.pos.y < player.pos.y + tempRadius) {
-            if (tempEntity != player) {
-                addAddEntityCommand(tempEntity, commandList);
+        while (true) {
+            var tempRadius = 40;
+            if (tempEntity.pos.x < player.pos.x - tempRadius || tempEntity.pos.x > player.pos.x + tempRadius
+                    || tempEntity.pos.y < player.pos.y - tempRadius && tempEntity.pos.y > player.pos.y + tempRadius) {
+                break;
             }
+            if (tempEntity == player) {
+                break;
+            }
+            if (classUtils.isInstanceOf(tempEntity, Crack)) {
+                if (tempEntity.username == player.username) {
+                    break;
+                }
+            }
+            addAddEntityCommand(tempEntity, commandList);
+            break;
         }
         index += 1;
     }
@@ -277,6 +305,10 @@ function performGetOnlinePlayersCommand(command, player, commandList) {
         }
         index += 1;
     }
+}
+
+function performRemoveTileCommand(command, player, commandList) {
+    player.removeTile(command.direction);
 }
 
 GameUtils.prototype.persistEverything = function(done) {

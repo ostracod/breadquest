@@ -34,7 +34,7 @@ module.exports = {
     TRAIL_TILE_AMOUNT: TRAIL_TILE_AMOUNT
 }
 
-var Pos = require("models/Pos").Pos;
+var Pos = require("models/pos").Pos;
 var chunkUtils = require("utils/chunk");
 
 var tempTerrainOffsetSet1 = [

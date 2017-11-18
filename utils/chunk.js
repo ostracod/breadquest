@@ -10,11 +10,11 @@ module.exports = chunkUtils;
 var fs = require("fs");
 var pathUtils = require("path");
 
-var tempResource = require("models/Pos");
+var tempResource = require("models/pos");
 var Pos = tempResource.Pos;
 var createPosFromJson = tempResource.createPosFromJson;
 
-var tempResource = require("models/Chunk");
+var tempResource = require("models/chunk");
 var Chunk = tempResource.Chunk;
 var chunkSize = tempResource.chunkSize;
 var chunkTileLength = tempResource.chunkTileLength;

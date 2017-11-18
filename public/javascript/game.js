@@ -171,6 +171,13 @@ function addGetOnlinePlayersCommand() {
     });
 }
 
+function addRemoveTileCommand(direction) {
+    gameUpdateCommandList.push({
+        commandName: "removeTile",
+        direction: direction
+    });
+}
+
 function performSetLocalPlayerInfoCommand(command) {
     localPlayer.username = command.username;
     localPlayer.avatar = command.avatar;
@@ -216,14 +223,20 @@ function performRemoveAllEntitiesCommand(command) {
 function performAddEntityCommand(command) {
     var tempEntityInfo = command.entityInfo;
     var tempClassName = tempEntityInfo.className;
+    var tempPos = createPosFromJson(tempEntityInfo.pos);
     if (tempClassName == "Player") {
-        var tempPos = createPosFromJson(tempEntityInfo.pos);
         new Player(
             tempEntityInfo.id,
             tempPos,
             tempEntityInfo.username,
             tempEntityInfo.avatar,
             tempEntityInfo.breadCount
+        );
+    }
+    if (tempClassName == "Crack") {
+        new Crack(
+            tempEntityInfo.id,
+            tempPos,
         );
     }
 }
@@ -386,8 +399,7 @@ Player.prototype.removeTile = function(direction) {
     localCrackTile = getTileBufferValue(tempPos);
     var tempDate = new Date();
     localCrackExpirationTime = tempDate.getTime() + 1000;
-    // TODO: Implement the rest.
-    console.log("Remove " + tempPos.toString());
+    addRemoveTileCommand(direction);
 }
 
 Player.prototype.placeOrRemoveTile = function(direction) {

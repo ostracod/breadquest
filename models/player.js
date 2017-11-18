@@ -1,14 +1,18 @@
 
 var classUtils = require("utils/class");
-var Pos = require("models/Pos").Pos;
-var Entity = require("models/Entity").Entity;
-var entityList = require("models/Entity").entityList;
-var getNextChatMessageId = require("models/ChatMessage").getNextChatMessageId;
+var Pos = require("models/pos").Pos;
+
+var tempResource = require("models/entity");
+var Entity = tempResource.Entity;
+var entityList = tempResource.entityList;
+
+var Crack = require("models/crack").Crack;
+var getNextChatMessageId = require("models/chatMessage").getNextChatMessageId;
 var accountUtils = require("utils/account");
 var gameUtils = require("utils/game");
 var chunkUtils = require("utils/chunk");
 
-var tempResource = require("models/Chunk");
+var tempResource = require("models/chunk");
 var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
 var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
 var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
@@ -80,10 +84,15 @@ Player.prototype.getClientInfo = function() {
     }
 }
 
-Player.prototype.walk = function(direction) {
+Player.prototype.getPosInWalkDirection = function(direction) {
     var tempOffset = playerWalkOffsetList[direction];
-    var tempPos = this.pos.copy();
-    tempPos.add(tempOffset);
+    var output = this.pos.copy();
+    output.add(tempOffset);
+    return output;
+}
+
+Player.prototype.walk = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = chunkUtils.getTile(tempPos);
     if ((tempTile >= BLOCK_START_TILE && tempTile < BLOCK_START_TILE + BLOCK_TILE_AMOUNT)
             || tempTile == 0) {
@@ -91,6 +100,14 @@ Player.prototype.walk = function(direction) {
     }
     this.pos.set(tempPos);
     chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
+}
+
+Player.prototype.removeTile = function(direction) {
+    if (gameUtils.getCrackByUsername(this.username) !== null) {
+        return;
+    }
+    var tempPos = this.getPosInWalkDirection(direction);
+    new Crack(tempPos, this.username);
 }
 
 module.exports = {

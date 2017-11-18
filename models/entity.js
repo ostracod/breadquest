@@ -1,5 +1,5 @@
 
-var Pos = require("models/Pos").Pos;
+var Pos = require("models/pos").Pos;
 
 var entityList = [];
 var nextEntityId = 0;
