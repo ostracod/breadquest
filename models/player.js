@@ -5,6 +5,18 @@ var Entity = require("models/Entity").Entity;
 var entityList = require("models/Entity").entityList;
 var accountUtils = require("utils/account");
 var gameUtils = require("utils/game");
+var chunkUtils = require("utils/chunk");
+
+var tempResource = require("models/Chunk");
+var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
+var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
+
+var playerWalkOffsetList = [
+    new Pos(0, -1),
+    new Pos(1, 0),
+    new Pos(0, 1),
+    new Pos(-1, 0),
+];
 
 function Player(account) {
     Entity.call(this, new Pos(0, 0));
@@ -60,6 +72,18 @@ Player.prototype.getClientInfo = function() {
         pos: this.pos.toJson(),
         username: this.username,
     }
+}
+
+Player.prototype.walk = function(direction) {
+    var tempOffset = playerWalkOffsetList[direction];
+    var tempPos = this.pos.copy();
+    tempPos.add(tempOffset);
+    var tempTile = chunkUtils.getTile(tempPos);
+    if ((tempTile >= BLOCK_START_TILE && tempTile < BLOCK_START_TILE + BLOCK_TILE_AMOUNT)
+            || tempTile == 0) {
+        return;
+    }
+    this.pos.set(tempPos);
 }
 
 module.exports = {

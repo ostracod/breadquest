@@ -82,6 +82,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "setTiles") {
                 performSetTilesCommand(tempCommand);
             }
+            if (tempCommand.commandName == "setLocalPlayerPos") {
+                performSetLocalPlayerPosCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -105,6 +108,20 @@ function addGetTilesCommand() {
         commandName: "getTiles",
         pos: cameraPos.toJson(),
         size: canvasSpriteSize
+    });
+}
+
+function addWalkCommand(direction) {
+    gameUpdateCommandList.push({
+        commandName: "walk",
+        direction: direction
+    });
+}
+
+function addAssertPosCommand() {
+    gameUpdateCommandList.push({
+        commandName: "assertPos",
+        pos: localPlayer.pos.toJson()
     });
 }
 
@@ -134,6 +151,10 @@ function performSetTilesCommand(command) {
             tempOffset.y += 1;
         }
     }
+}
+
+function performSetLocalPlayerPosCommand(command) {
+    localPlayer.pos = createPosFromJson(command.pos);
 }
 
 function Entity(id, pos) {
@@ -206,6 +227,7 @@ Player.prototype.walk = function(direction) {
         return;
     }
     this.pos.set(tempPos);
+    addWalkCommand(direction);
 }
 
 function resetTileBuffer() {
@@ -618,6 +640,7 @@ function timerEvent() {
     if (!isRequestingGameUpdate) {
         gameUpdateRequestDelay -= 1;
         if (gameUpdateRequestDelay <= 0) {
+            addAssertPosCommand();
             addGetTilesCommand();
             new GameUpdateRequest();
         }

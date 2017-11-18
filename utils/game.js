@@ -78,6 +78,12 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getTiles") {
                 performGetTilesCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "walk") {
+                performWalkCommand(tempCommand, tempPlayer, tempCommandList);
+            }
+            if (tempCommand.commandName == "assertPos") {
+                performAssertPosCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -127,10 +133,16 @@ function addSetLocalPlayerInfoCommand(account, player, commandList) {
 function addSetTilesCommand(pos, size, tileList, commandList) {
     commandList.push({
         commandName: "setTiles",
-        pos: createPosFromJson(pos),
+        pos: pos.toJson(),
         tileList: tileList,
-        size: size,
-        tileList: tileList
+        size: size
+    });
+}
+
+function addSetLocalPlayerPosCommand(player, commandList) {
+    commandList.push({
+        commandName: "setLocalPlayerPos",
+        pos: player.pos.toJson(),
     });
 }
 
@@ -156,6 +168,17 @@ function performGetTilesCommand(command, player, commandList) {
     }
     var tempTileList = chunkUtils.getTiles(tempPos, tempSize);
     addSetTilesCommand(tempPos, tempSize, tempTileList, commandList);
+}
+
+function performWalkCommand(command, player, commandList) {
+    player.walk(command.direction);
+}
+
+function performAssertPosCommand(command, player, commandList) {
+    var tempPos = createPosFromJson(command.pos);
+    if (!player.pos.equals(tempPos)) {
+        addSetLocalPlayerPosCommand(player, commandList);
+    }
 }
 
 GameUtils.prototype.persistEverything = function(done) {
