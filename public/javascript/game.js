@@ -352,6 +352,7 @@ function Color(r, g, b) {
     this.r = r;
     this.g = g;
     this.b = b;
+    this.string = null;
 }
 
 Color.prototype.copy = function() {
@@ -399,7 +400,10 @@ Color.prototype.equals = function(color) {
 }
 
 Color.prototype.toString = function() {
-    return "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    if (this.string === null) {
+        this.string = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    }
+    return this.string;
 }
 
 colorSet = [
@@ -586,32 +590,43 @@ function drawSprite(pos, which) {
     );
 }
 
-function drawSquare(pos, colorIndex, isSmall) {
+function drawSquareOnContext(context, pos, size, colorIndex, isSmall) {
     var tempColor = colorSet[colorIndex];
-    var tempPosX = pos.x * spriteRenderSize;
-    var tempPosY = pos.y * spriteRenderSize;
+    var tempPosX = pos.x;
+    var tempPosY = pos.y;
     var tempSize;
     if (isSmall) {
-        tempPosX += spriteRenderSize * 3 / 8;
-        tempPosY += spriteRenderSize * 3 / 8;
-        tempSize = spriteRenderSize / 4;
+        tempPosX += size * 3 / 8;
+        tempPosY += size * 3 / 8;
+        tempSize = size / 4;
     } else {
-        tempSize = spriteRenderSize;
+        tempSize = size;
     }
     context.fillStyle = tempColor.toString();
     context.fillRect(tempPosX, tempPosY, tempSize, tempSize);
 }
 
-function drawTile(pos, which) {
+function drawTileOnContext(context, pos, size, which) {
     if (which == 0) {
-        drawSquare(pos, 9, false);
+        drawSquareOnContext(context, pos, size, 9, false);
     }
     if (which >= blockStartTile && which < blockStartTile + blockTileAmount) {
-        drawSquare(pos, which - blockStartTile, false);
+        drawSquareOnContext(context, pos, size, which - blockStartTile, false);
     }
     if (which >= trailStartTile && which < trailStartTile + trailTileAmount) {
-        drawSquare(pos, which - trailStartTile + 10, true);
+        drawSquareOnContext(context, pos, size, which - trailStartTile + 10, true);
     }
+}
+
+function drawTile(pos, which) {
+    var tempPos = pos.copy();
+    tempPos.scale(spriteRenderSize);
+    drawTileOnContext(
+        context,
+        tempPos,
+        spriteRenderSize,
+        which
+    );
 }
 
 function setZoom(which) {
