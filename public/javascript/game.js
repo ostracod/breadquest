@@ -46,6 +46,9 @@ var playerWalkOffsetList = [
 ];
 var shouldDrawNameTags = true;
 var inventoryItemList = [];
+var localCrack = null;
+var localCrackTile;
+var localCrackExpirationTime;
 
 var moduleList = [];
 
@@ -194,6 +197,9 @@ function performSetTilesCommand(command) {
             tempOffset.y += 1;
         }
     }
+    if (localCrack !== null) {
+        setTileBufferValue(localCrack.pos, localCrackTile);
+    }
 }
 
 function performSetLocalPlayerPosCommand(command) {
@@ -202,6 +208,9 @@ function performSetLocalPlayerPosCommand(command) {
 
 function performRemoveAllEntitiesCommand(command) {
     entityList = [localPlayer];
+    if (localCrack !== null) {
+        entityList.push(localCrack);
+    }
 }
 
 function performAddEntityCommand(command) {
@@ -369,12 +378,14 @@ Player.prototype.placeTile = function(direction) {
 }
 
 Player.prototype.removeTile = function(direction) {
-    var tempCrack = getLocalPlayerCrack();
-    if (tempCrack !== null) {
+    if (localCrack !== null) {
         return;
     }
     var tempPos = this.getPosInWalkDirection(direction);
-    new Crack(-1, tempPos, localPlayer.username);
+    localCrack = new Crack(-1, tempPos, localPlayer.username);
+    localCrackTile = getTileBufferValue(tempPos);
+    var tempDate = new Date();
+    localCrackExpirationTime = tempDate.getTime() + 1000;
     // TODO: Implement the rest.
     console.log("Remove " + tempPos.toString());
 }
@@ -399,29 +410,26 @@ Player.prototype.performActionInDirection = function(direction) {
     }
 }
 
-function Crack(id, pos, username) {
+function Crack(id, pos) {
     Entity.call(this, id, pos);
-    this.username = username;
 }
 setParentClass(Crack, Entity);
+
+
+Crack.prototype.tick = function() {
+    Entity.prototype.tick.call(this);
+    if (this == localCrack) {
+        var tempDate = new Date();
+        if (tempDate.getTime() >= localCrackExpirationTime) {
+            this.remove();
+            localCrack = null;
+        }
+    }
+}
 
 Crack.prototype.draw = function() {
     Entity.prototype.draw.call(this);
     drawSprite(this.getDisplayPos(), 64);
-}
-
-function getLocalPlayerCrack() {
-    var index = 0;
-    while (index < entityList.length) {
-        var tempEntity = entityList[index];
-        if (isInstanceOf(tempEntity, Crack)) {
-            if (tempEntity.username == localPlayer.username) {
-                return tempEntity;
-            }
-        }
-        index += 1;
-    }
-    return null;
 }
 
 function resetTileBuffer() {
