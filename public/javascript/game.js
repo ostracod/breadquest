@@ -906,6 +906,8 @@ function timerEvent() {
         index += 1;
     }
     
+    document.getElementById("coordinates").innerHTML = localPlayer.pos.toString();
+    
 }
 
 function addAllInventoryItemsToMode() {
