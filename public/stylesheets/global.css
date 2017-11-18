@@ -120,3 +120,23 @@ input:not([type]), input:[type="text"] {
     width: 0px;
     height: 10px;
 }
+
+.inventoryItem {
+    padding-bottom: 2px;
+    padding-top: 2px;
+    border: 3px #FFFFFF solid;
+}
+
+.inventoryItem canvas {
+    margin-left: 4px;
+    margin-right: 7px;
+    margin-top: 2px;
+}
+
+.inventoryItem strong, .inventoryItem span {
+    vertical-align: 2px;
+}
+
+.inventoryItem strong {
+    margin-right: 5px;
+}

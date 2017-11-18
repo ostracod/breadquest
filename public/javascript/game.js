@@ -45,6 +45,7 @@ var playerWalkOffsetList = [
     new Pos(-1, 0),
 ];
 var shouldDrawNameTags = true;
+var inventoryItemList = [];
 
 var moduleList = [];
 
@@ -252,6 +253,42 @@ function Entity(id, pos) {
     this.pos = pos;
     entityList.push(this);
 }
+
+function InventoryItem(tile, name) {
+    this.tile = tile;
+    this.name = name;
+    this.count = 0;
+    inventoryItemList.push(this);
+}
+
+InventoryItem.prototype.addToModule = function() {
+    var tempContainer = document.getElementById("inventoryDiv");
+    var tempTag = document.createElement("div");
+    tempTag.className = "inventoryItem"
+    var tempCanvas = document.createElement("canvas");
+    var tempSize = 32;
+    tempCanvas.width = tempSize / 2;
+    tempCanvas.height = tempSize / 2;
+    tempTag.appendChild(tempCanvas);
+    var tempNameLabel = document.createElement("strong");
+    tempNameLabel.innerHTML = this.name;
+    tempTag.appendChild(tempNameLabel);
+    var tempCountLabel = document.createElement("span");
+    tempCountLabel.innerHTML = "(x" + this.count + ")";
+    tempTag.appendChild(tempCountLabel);
+    tempContainer.appendChild(tempTag);
+    var tempContext = tempCanvas.getContext("2d");
+    drawTileOnContext(tempContext, new Pos(0, 0), tempSize, this.tile);
+}
+
+new InventoryItem(blockStartTile + 0, "Red Block");
+new InventoryItem(blockStartTile + 1, "Orange Block");
+new InventoryItem(blockStartTile + 2, "Yellow Block");
+new InventoryItem(blockStartTile + 3, "Green Block");
+new InventoryItem(blockStartTile + 4, "Teal Block");
+new InventoryItem(blockStartTile + 5, "Blue Block");
+new InventoryItem(blockStartTile + 6, "Purple Block");
+new InventoryItem(blockStartTile + 7, "Gray Block");
 
 Entity.prototype.remove = function() {
     var index = 0;
@@ -804,6 +841,15 @@ function timerEvent() {
     
 }
 
+function addAllInventoryItemsToMode() {
+    var index = 0;
+    while (index < inventoryItemList.length) {
+        var tempInventoryItem = inventoryItemList[index];
+        tempInventoryItem.addToModule();
+        index += 1;
+    }
+}
+
 function initializeGame() {
     
     setZoom(1);
@@ -830,13 +876,16 @@ function initializeGame() {
     overlayChatInput = document.getElementById("overlayChatInput");
     overlayChatOutput = document.getElementById("overlayChatOutput");
     
-    initializeSpriteSheet(function() {});
+    initializeSpriteSheet(function() {
+        addAllInventoryItemsToMode();
+    });
     
     var tempModule = new Module("stats");
     tempModule.show();
+    var tempModule = new Module("inventory");
+    tempModule.show();
     var tempModule = new Module("chat");
     var tempModule = new Module("onlinePlayers");
-    tempModule.show();
     
     new Bar(document.getElementById("hpBar"), function() {return localPlayerHp / localPlayerMaximumHp;});
     
