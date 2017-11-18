@@ -100,7 +100,7 @@ function addStartPlayingCommand() {
     });
 }
 
-function addGetEntitiesCommand() {
+function addGetTilesCommand() {
     gameUpdateCommandList.push({
         commandName: "getTiles",
         pos: cameraPos.toJson(),
@@ -618,7 +618,7 @@ function timerEvent() {
     if (!isRequestingGameUpdate) {
         gameUpdateRequestDelay -= 1;
         if (gameUpdateRequestDelay <= 0) {
-            addGetEntitiesCommand();
+            addGetTilesCommand();
             new GameUpdateRequest();
         }
     }
