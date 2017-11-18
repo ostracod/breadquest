@@ -97,6 +97,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getChatMessages") {
                 performGetChatMessagesCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "getOnlinePlayers") {
+                performGetOnlinePlayersCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -180,6 +183,19 @@ function addAddChatMessageCommand(chatMessage, commandList) {
     });
 }
 
+function addRemoveAllOnlinePlayersCommand(commandList) {
+    commandList.push({
+        commandName: "removeAllOnlinePlayers"
+    });
+}
+
+function addAddOnlinePlayerCommand(username, commandList) {
+    commandList.push({
+        commandName: "addOnlinePlayer",
+        username: username
+    });
+}
+
 function performStartPlayingCommand(command, player, commandList, done) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
@@ -249,6 +265,18 @@ function performGetChatMessagesCommand(command, player, commandList) {
         index += 1;
     }
     player.lastChatMessageId = tempHighestId;
+}
+
+function performGetOnlinePlayersCommand(command, player, commandList) {
+    addRemoveAllOnlinePlayersCommand(commandList);
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (classUtils.isInstanceOf(tempEntity, Player)) {
+            addAddOnlinePlayerCommand(tempEntity.username, commandList);
+        }
+        index += 1;
+    }
 }
 
 GameUtils.prototype.persistEverything = function(done) {

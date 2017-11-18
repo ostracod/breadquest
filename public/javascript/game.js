@@ -96,6 +96,12 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "addChatMessage") {
                 performAddChatMessageCommand(tempCommand);
             }
+            if (tempCommand.commandName == "removeAllOnlinePlayers") {
+                performRemoveAllOnlinePlayersCommand(tempCommand);
+            }
+            if (tempCommand.commandName == "addOnlinePlayer") {
+                performAddOnlinePlayerCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -152,6 +158,12 @@ function addAddChatMessageCommand(text) {
 function addGetChatMessagesCommand() {
     gameUpdateCommandList.push({
         commandName: "getChatMessages"
+    });
+}
+
+function addGetOnlinePlayersCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getOnlinePlayers"
     });
 }
 
@@ -223,6 +235,16 @@ function performAddChatMessageCommand(command) {
         chatOutput.scrollTop = chatOutput.scrollHeight;
     }
     new OverlayChatMessage(tempPlayerName, tempText);
+}
+
+function performRemoveAllOnlinePlayersCommand(command) {
+    var tempTag = document.getElementById("onlinePlayersDiv");
+    tempTag.innerHTML = "";
+}
+
+function performAddOnlinePlayerCommand(command) {
+    var tempTag = document.getElementById("onlinePlayersDiv");
+    tempTag.innerHTML += "<strong>" + encodeHtmlEntity(command.username) + "</strong><br />";
 }
 
 function Entity(id, pos) {
@@ -728,6 +750,7 @@ function timerEvent() {
             addGetEntitiesCommand();
             addGetTilesCommand();
             addGetChatMessagesCommand();
+            addGetOnlinePlayersCommand();
             new GameUpdateRequest();
         }
     }
