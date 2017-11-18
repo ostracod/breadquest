@@ -42,6 +42,7 @@ var playerWalkOffsetList = [
     new Pos(0, 1),
     new Pos(-1, 0),
 ];
+var shouldDrawNameTags = true;
 
 var moduleList = [];
 
@@ -187,7 +188,12 @@ Player.prototype.draw = function() {
     Entity.prototype.draw.call(this);
     var tempPos = this.getDisplayPos().copy();
     drawSprite(tempPos, 0 + this.avatar)
-    //drawCenteredText(...);
+    if (shouldDrawNameTags) {
+        tempPos.scale(spriteRenderSize);
+        tempPos.x += spriteRenderSize / 2;
+        tempPos.y -= spriteRenderSize / 2;
+        drawCenteredText(tempPos, this.username + " (" + this.breadCount + ")");
+    }
 }
 
 Player.prototype.walk = function(direction) {
@@ -411,7 +417,7 @@ function drawCenteredText(pos, text) {
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillStyle = "#000000";
-    context.fillText(text, Math.floor(pos.x) * pixelSize, Math.floor(pos.y) * pixelSize);
+    context.fillText(text, Math.floor(pos.x), Math.floor(pos.y));
 }
 
 function showOrHideModuleByName(name) {
@@ -484,10 +490,12 @@ function setZoom(which) {
     if (which == 0) {
         spriteRenderSize = 32;
         canvasSpriteSize = 30;
+        shouldDrawNameTags = false;
     }
     if (which == 1) {
         spriteRenderSize = 64;
         canvasSpriteSize = 15;
+        shouldDrawNameTags = true;
     }
 }
 
