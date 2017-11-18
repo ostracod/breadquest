@@ -93,6 +93,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "addEntity") {
                 performAddEntityCommand(tempCommand);
             }
+            if (tempCommand.commandName == "addChatMessage") {
+                performAddChatMessageCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -136,6 +139,19 @@ function addAssertPosCommand() {
 function addGetEntitiesCommand() {
     gameUpdateCommandList.push({
         commandName: "getEntities"
+    });
+}
+
+function addAddChatMessageCommand(text) {
+    gameUpdateCommandList.push({
+        commandName: "addChatMessage",
+        text: text
+    });
+}
+
+function addGetChatMessagesCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getChatMessages"
     });
 }
 
@@ -188,6 +204,25 @@ function performAddEntityCommand(command) {
             tempEntityInfo.breadCount
         );
     }
+}
+
+function performAddChatMessageCommand(command) {
+    var tempPlayerName = encodeHtmlEntity(command.username);
+    var tempText = encodeHtmlEntity(command.text);
+    var tempIsAtBottom = (chatOutput.scrollTop + 150 > chatOutput.scrollHeight - 30);
+    var tempTag = document.createElement("div");
+    tempTag.innerHTML = "<strong>" + tempPlayerName + ":</strong> " + tempText;
+    chatOutput.appendChild(tempTag);
+    chatMessageTagList.push(tempTag);
+    while (chatMessageTagList.length > maximumChatMessageCount) {
+        var tempTag = chatMessageTagList[0];
+        chatOutput.removeChild(tempTag);
+        chatMessageTagList.splice(0, 1);
+    }
+    if (tempIsAtBottom) {
+        chatOutput.scrollTop = chatOutput.scrollHeight;
+    }
+    new OverlayChatMessage(tempPlayerName, tempText);
 }
 
 function Entity(id, pos) {
@@ -692,6 +727,7 @@ function timerEvent() {
             addAssertPosCommand();
             addGetEntitiesCommand();
             addGetTilesCommand();
+            addGetChatMessagesCommand();
             new GameUpdateRequest();
         }
     }

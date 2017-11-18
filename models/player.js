@@ -3,6 +3,7 @@ var classUtils = require("utils/class");
 var Pos = require("models/Pos").Pos;
 var Entity = require("models/Entity").Entity;
 var entityList = require("models/Entity").entityList;
+var getNextChatMessageId = require("models/ChatMessage").getNextChatMessageId;
 var accountUtils = require("utils/account");
 var gameUtils = require("utils/game");
 var chunkUtils = require("utils/chunk");
@@ -25,6 +26,7 @@ function Player(account) {
     this.avatar = account.avatar;
     var tempDate = new Date();
     this.lastActivityTime = tempDate.getTime();
+    this.lastChatMessageId = getNextChatMessageId() - 10;
 }
 classUtils.setParentClass(Player, Entity);
 

@@ -11,6 +11,10 @@ var tempResource = require("models/Pos");
 var Pos = tempResource.Pos;
 var createPosFromJson = tempResource.createPosFromJson;
 
+var tempResource = require("models/ChatMessage");
+var ChatMessage = tempResource.ChatMessage;
+var chatMessageList = tempResource.chatMessageList;
+
 var entityList = require("models/Entity").entityList;
 var Player = require("models/Player").Player;
 
@@ -87,6 +91,12 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getEntities") {
                 performGetEntitiesCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "addChatMessage") {
+                performAddChatMessageCommand(tempCommand, tempPlayer, tempCommandList);
+            }
+            if (tempCommand.commandName == "getChatMessages") {
+                performGetChatMessagesCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -162,6 +172,14 @@ function addAddEntityCommand(entity, commandList) {
     });
 }
 
+function addAddChatMessageCommand(chatMessage, commandList) {
+    commandList.push({
+        commandName: "addChatMessage",
+        username: chatMessage.username,
+        text: chatMessage.text
+    });
+}
+
 function performStartPlayingCommand(command, player, commandList, done) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
@@ -211,6 +229,26 @@ function performGetEntitiesCommand(command, player, commandList) {
         }
         index += 1;
     }
+}
+
+function performAddChatMessageCommand(command, player, commandList) {
+    new ChatMessage(player.username, command.text);
+}
+
+function performGetChatMessagesCommand(command, player, commandList) {
+    var tempHighestId = -1;
+    var index = 0;
+    while (index < chatMessageList.length) {
+        var tempChatMessage = chatMessageList[index];
+        if (tempChatMessage.id > player.lastChatMessageId) {
+            addAddChatMessageCommand(tempChatMessage, commandList);
+        }
+        if (tempChatMessage.id > tempHighestId) {
+            tempHighestId = tempChatMessage.id;
+        }
+        index += 1;
+    }
+    player.lastChatMessageId = tempHighestId;
 }
 
 GameUtils.prototype.persistEverything = function(done) {
