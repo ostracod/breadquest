@@ -71,6 +71,10 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             }
             var tempCommand = commandList[index];
             index += 1;
+            if (tempCommand.commandName == "startPlaying") {
+                performStartPlayingCommand(tempCommand, tempPlayer, tempCommandList, processNextCommand);
+                return;
+            }
             if (tempCommand.commandName == "getTiles") {
                 performGetTilesCommand(tempCommand, tempPlayer, tempCommandList);
             }
@@ -110,6 +114,16 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
     }
 }
 
+function addSetLocalPlayerInfoCommand(account, player, commandList) {
+    commandList.push({
+        commandName: "setLocalPlayerInfo",
+        username: account.username,
+        avatar: account.avatar,
+        // TODO: Populate this value.
+        breadCount: 0
+    });
+}
+
 function addSetTilesCommand(pos, size, tileList, commandList) {
     commandList.push({
         commandName: "setTiles",
@@ -117,6 +131,20 @@ function addSetTilesCommand(pos, size, tileList, commandList) {
         tileList: tileList,
         size: size,
         tileList: tileList
+    });
+}
+
+function performStartPlayingCommand(command, player, commandList, done) {
+    accountUtils.acquireLock(function() {
+        accountUtils.findAccountByUsername(player.username, function(error, index, result) {
+            accountUtils.releaseLock();
+            if (error) {
+                reportDatabaseErrorWithJson(error, res);
+                return;
+            }
+            addSetLocalPlayerInfoCommand(result, player, commandList);
+            done();
+        });
     });
 }
 

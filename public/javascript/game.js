@@ -34,6 +34,8 @@ var tileBufferSize = 100;
 var blockStartTile = 129;
 var blockTileAmount = 8;
 var emptyTile = 128;
+var entityList = [];
+var localPlayer;
 
 var moduleList = [];
 
@@ -67,6 +69,9 @@ GameUpdateRequest.prototype.respond = function(data) {
         var index = 0;
         while (index < tempCommandList.length) {
             var tempCommand = tempCommandList[index];
+            if (tempCommand.commandName == "setLocalPlayerInfo") {
+                performSetLocalPlayerInfoCommand(tempCommand);
+            }
             if (tempCommand.commandName == "setTiles") {
                 performSetTilesCommand(tempCommand);
             }
@@ -82,12 +87,24 @@ GameUpdateRequest.prototype.respond = function(data) {
     AjaxRequest.prototype.respond.call(this, data);
 }
 
+function addStartPlayingCommand() {
+    gameUpdateCommandList.push({
+        commandName: "startPlaying"
+    });
+}
+
 function addGetEntitiesCommand() {
     gameUpdateCommandList.push({
         commandName: "getTiles",
         pos: cameraPos.toJson(),
         size: canvasSpriteSize
     });
+}
+
+function performSetLocalPlayerInfoCommand(command) {
+    localPlayer.username = command.username;
+    localPlayer.avatar = command.avatar;
+    localPlayer.breadCount = command.breadCount;
 }
 
 function performSetTilesCommand(command) {
@@ -110,6 +127,61 @@ function performSetTilesCommand(command) {
             tempOffset.y += 1;
         }
     }
+}
+
+function Entity(id, pos) {
+    this.id = id;
+    this.pos = pos;
+    entityList.push(this);
+}
+
+Entity.prototype.remove = function() {
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (this == tempEntity) {
+            entityList.splice(index, 1);
+            break;
+        }
+        index += 1;
+    }
+}
+
+Entity.prototype.tick = function() {
+    // Do nothing.
+}
+
+Entity.prototype.draw = function() {
+    // Do nothing.
+}
+
+Entity.prototype.getDisplayPos = function() {
+    var output = this.pos.copy();
+    output.subtract(cameraPos);
+    return output;
+}
+
+function Player(id, pos, username, avatar, breadCount) {
+    Entity.call(this, id, pos);
+    this.username = username;
+    this.avatar = avatar;
+    this.breadCount = breadCount;
+}
+setParentClass(Player, Entity);
+
+Player.prototype.tick = function() {
+    Entity.prototype.tick.call(this);
+    // Do nothing.
+}
+
+Player.prototype.draw = function() {
+    if (this.username === null) {
+        return;
+    }
+    Entity.prototype.draw.call(this);
+    var tempPos = this.getDisplayPos().copy();
+    drawSprite(tempPos, 0 + this.avatar)
+    //drawCenteredText(...);
 }
 
 function resetTileBuffer() {
@@ -525,6 +597,13 @@ function timerEvent() {
         }
     }
     
+    var index = entityList.length - 1;
+    while (index >= 0) {
+        var tempEntity = entityList[index];
+        tempEntity.tick();
+        index -= 1;
+    }
+    
     clearCanvas();
     var tempPos = new Pos(0, 0);
     var tempOffset = new Pos(0, 0);
@@ -538,6 +617,12 @@ function timerEvent() {
             tempOffset.x = 0;
             tempOffset.y += 1;
         }
+    }
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        tempEntity.draw();
+        index += 1;
     }
     
 }
@@ -580,6 +665,9 @@ function initializeGame() {
     
     window.onkeydown = keyDownEvent;
     window.onkeyup = keyUpEvent;
+    
+    localPlayer = new Player(-1, new Pos(0, 0), null, null, null);
+    addStartPlayingCommand();
     
     setInterval(timerEvent, Math.floor(Math.floor(1000 / framesPerSecond)));
 }
