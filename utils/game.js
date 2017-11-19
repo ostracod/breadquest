@@ -312,6 +312,10 @@ function performRemoveTileCommand(command, player, commandList) {
 }
 
 GameUtils.prototype.persistEverything = function(done) {
+    if (isPersistingEverything) {
+        done();
+        return;
+    }
     console.log("Saving world state...");
     isPersistingEverything = true;
     chunkUtils.persistAllChunks();
@@ -334,6 +338,16 @@ GameUtils.prototype.persistEverything = function(done) {
     }
     persistNextEntity();
 }
+
+function exitEvent() {
+    gameUtils.persistEverything(function() {
+        process.exit();
+    })
+}
+
+process.on("SIGINT", exitEvent);
+process.on("SIGUSR1", exitEvent);
+process.on("SIGUSR2", exitEvent);
 
 GameUtils.prototype.stopGame = function(done) {
     hasStopped = true;
