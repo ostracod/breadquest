@@ -118,6 +118,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "removeTile") {
                 performRemoveTileCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "getInventoryChanges") {
+                performGetInventoryChangesCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -214,6 +217,14 @@ function addAddOnlinePlayerCommand(username, commandList) {
     });
 }
 
+function addSetInventoryCommand(inventory, commandList) {
+    commandList.push({
+        commandName: "setInventory",
+        inventory: inventory.toJson()
+    });
+    inventory.hasChanged = false;
+}
+
 function performStartPlayingCommand(command, player, commandList, done) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
@@ -223,6 +234,7 @@ function performStartPlayingCommand(command, player, commandList, done) {
                 return;
             }
             addSetLocalPlayerInfoCommand(result, player, commandList);
+            addSetInventoryCommand(player.inventory, commandList);
             done();
         });
     });
@@ -309,6 +321,13 @@ function performGetOnlinePlayersCommand(command, player, commandList) {
 
 function performRemoveTileCommand(command, player, commandList) {
     player.removeTile(command.direction);
+}
+
+function performGetInventoryChangesCommand(command, player, commandList) {
+    var tempInventory = player.inventory;
+    if (tempInventory.hasChanged) {
+        addSetInventoryCommand(player.inventory, commandList);
+    }
 }
 
 GameUtils.prototype.persistEverything = function(done) {

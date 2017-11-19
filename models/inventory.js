@@ -18,7 +18,7 @@ Inventory.prototype.getTileCount = function(tile) {
 
 Inventory.prototype.setTileCount = function(tile, count) {
     this.tileCountMap[tile] = count;
-    this.hasChanged = false;
+    this.hasChanged = true;
 }
 
 Inventory.prototype.incrementTileCount = function(tile) {

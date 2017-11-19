@@ -106,6 +106,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "addOnlinePlayer") {
                 performAddOnlinePlayerCommand(tempCommand);
             }
+            if (tempCommand.commandName == "setInventory") {
+                performSetInventoryCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -175,6 +178,12 @@ function addRemoveTileCommand(direction) {
     gameUpdateCommandList.push({
         commandName: "removeTile",
         direction: direction
+    });
+}
+
+function addGetInventoryChanges() {
+    gameUpdateCommandList.push({
+        commandName: "getInventoryChanges",
     });
 }
 
@@ -270,6 +279,20 @@ function performAddOnlinePlayerCommand(command) {
     tempTag.innerHTML += "<strong>" + encodeHtmlEntity(command.username) + "</strong><br />";
 }
 
+function performSetInventoryCommand(command) {
+    var tempInventory = command.inventory;
+    var index = 0;
+    while (index < inventoryItemList.length) {
+        var tempInventoryItem = inventoryItemList[index];
+        var tempTile = tempInventoryItem.tile;
+        if (tempTile in tempInventory) {
+            var tempCount = tempInventory[tempTile];
+            tempInventoryItem.setCount(tempCount);
+        }
+        index += 1;
+    }
+}
+
 function Entity(id, pos) {
     this.id = id;
     this.pos = pos;
@@ -280,6 +303,7 @@ function InventoryItem(tile, name) {
     this.tile = tile;
     this.name = name;
     this.count = 0;
+    this.countLabel = null;
     inventoryItemList.push(this);
 }
 
@@ -295,12 +319,21 @@ InventoryItem.prototype.addToModule = function() {
     var tempNameLabel = document.createElement("strong");
     tempNameLabel.innerHTML = this.name;
     tempTag.appendChild(tempNameLabel);
-    var tempCountLabel = document.createElement("span");
-    tempCountLabel.innerHTML = "(x" + this.count + ")";
-    tempTag.appendChild(tempCountLabel);
+    this.countLabel = document.createElement("span");
+    tempTag.appendChild(this.countLabel);
+    this.displayCount();
     tempContainer.appendChild(tempTag);
     var tempContext = tempCanvas.getContext("2d");
     drawTileOnContext(tempContext, new Pos(0, 0), tempSize, this.tile);
+}
+
+InventoryItem.prototype.displayCount = function() {
+    this.countLabel.innerHTML = "(x" + this.count + ")";
+}
+
+InventoryItem.prototype.setCount = function(count) {
+    this.count = count;
+    this.displayCount();
 }
 
 new InventoryItem(blockStartTile + 0, "Red Block");
@@ -890,6 +923,7 @@ function timerEvent() {
             addGetTilesCommand();
             addGetChatMessagesCommand();
             addGetOnlinePlayersCommand();
+            addGetInventoryChanges();
             new GameUpdateRequest();
         }
     }
