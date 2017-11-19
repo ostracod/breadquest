@@ -7,6 +7,7 @@ var Entity = tempResource.Entity;
 var entityList = tempResource.entityList;
 
 var Crack = require("models/crack").Crack;
+var Inventory = require("models/inventory").Inventory;
 var getNextChatMessageId = require("models/chatMessage").getNextChatMessageId;
 var accountUtils = require("utils/account");
 var gameUtils = require("utils/game");
@@ -31,6 +32,7 @@ function Player(account) {
     var tempDate = new Date();
     this.lastActivityTime = tempDate.getTime();
     this.lastChatMessageId = getNextChatMessageId() - 10;
+    this.inventory = new Inventory(account);
 }
 classUtils.setParentClass(Player, Entity);
 
@@ -58,8 +60,7 @@ Player.prototype.persist = function(done) {
                 console.log(error);
                 return;
             }
-            // TODO: Save account information.
-            
+            result.inventory = self.inventory.toJson();
             accountUtils.setAccount(index, result, function(error) {
                 accountUtils.releaseLock();
                 if (error) {
