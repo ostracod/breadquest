@@ -49,6 +49,7 @@ var inventoryItemList = [];
 var localCrack = null;
 var localCrackTile;
 var localCrackExpirationTime;
+var selectedInventoryItemIndex = 0;
 
 var moduleList = [];
 
@@ -303,28 +304,34 @@ function InventoryItem(tile, name) {
     this.tile = tile;
     this.name = name;
     this.count = 0;
+    this.tag = null;
     this.countLabel = null;
     inventoryItemList.push(this);
 }
 
 InventoryItem.prototype.addToModule = function() {
     var tempContainer = document.getElementById("inventoryDiv");
-    var tempTag = document.createElement("div");
-    tempTag.className = "inventoryItem"
+    this.tag = document.createElement("div");
+    this.tag.className = "inventoryItem"
     var tempCanvas = document.createElement("canvas");
     var tempSize = 32;
     tempCanvas.width = tempSize / 2;
     tempCanvas.height = tempSize / 2;
-    tempTag.appendChild(tempCanvas);
+    this.tag.appendChild(tempCanvas);
     var tempNameLabel = document.createElement("strong");
     tempNameLabel.innerHTML = this.name;
-    tempTag.appendChild(tempNameLabel);
+    this.tag.appendChild(tempNameLabel);
     this.countLabel = document.createElement("span");
-    tempTag.appendChild(this.countLabel);
+    this.tag.appendChild(this.countLabel);
     this.displayCount();
-    tempContainer.appendChild(tempTag);
+    tempContainer.appendChild(this.tag);
     var tempContext = tempCanvas.getContext("2d");
     drawTileOnContext(tempContext, new Pos(0, 0), tempSize, this.tile);
+    this.updateBorder();
+    var index = this.getIndex();
+    this.tag.onclick = function() {
+        selectInventoryItem(index);
+    }
 }
 
 InventoryItem.prototype.displayCount = function() {
@@ -334,6 +341,29 @@ InventoryItem.prototype.displayCount = function() {
 InventoryItem.prototype.setCount = function(count) {
     this.count = count;
     this.displayCount();
+}
+
+InventoryItem.prototype.getIndex = function() {
+    return inventoryItemList.indexOf(this);
+}
+
+InventoryItem.prototype.updateBorder = function() {
+    var index = this.getIndex();
+    if (index == selectedInventoryItemIndex) {
+        this.tag.style.border = "3px #000000 solid";
+    } else {
+        this.tag.style.border = "3px #FFFFFF solid";
+    }
+}
+
+function selectInventoryItem(index) {
+    selectedInventoryItemIndex = index;
+    var index = 0;
+    while (index < inventoryItemList.length) {
+        var tempInventoryItem = inventoryItemList[index];
+        tempInventoryItem.updateBorder();
+        index += 1;
+    }
 }
 
 new InventoryItem(blockStartTile + 0, "Red Block");
@@ -799,6 +829,12 @@ function setZoom(which) {
     }
 }
 
+function centerSelectedInventoryItem() {
+    var tempInventoryItem = inventoryItemList[selectedInventoryItemIndex];
+    var tempOffset = selectedInventoryItemIndex * tempInventoryItem.tag.offsetHeight - 85;
+    document.getElementById("inventoryDiv").scrollTop = tempOffset;
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -849,6 +885,22 @@ function keyDownEvent(event) {
         }
         if ((keyCode == 187 || keyCode == 61) && shiftKeyIsHeld) {
             setZoom(1);
+        }
+        if (keyCode == 82) {
+            var index = selectedInventoryItemIndex - 1;
+            if (index < 0) {
+                index = inventoryItemList.length - 1;
+            }
+            selectInventoryItem(index);
+            centerSelectedInventoryItem();
+        }
+        if (keyCode == 70) {
+            var index = selectedInventoryItemIndex + 1;
+            if (index >= inventoryItemList.length) {
+                index = 0;
+            }
+            selectInventoryItem(index);
+            centerSelectedInventoryItem();
         }
         if (keyCode >= 37 && keyCode <= 40) {
             return false;
