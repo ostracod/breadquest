@@ -94,6 +94,10 @@ Player.prototype.getPosInWalkDirection = function(direction) {
 }
 
 Player.prototype.walk = function(direction) {
+    var tempCrack = gameUtils.getCrackByUsername(this.username);
+    if (tempCrack !== null) {
+        return;
+    }
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = chunkUtils.getTile(tempPos);
     if ((tempTile >= BLOCK_START_TILE && tempTile < BLOCK_START_TILE + BLOCK_TILE_AMOUNT)

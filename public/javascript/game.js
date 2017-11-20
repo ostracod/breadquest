@@ -445,6 +445,11 @@ Player.prototype.getPosInWalkDirection = function(direction) {
 }
 
 Player.prototype.walk = function(direction) {
+    if (this == localPlayer) {
+        if (localCrack !== null) {
+            return;
+        }
+    }
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = getTileBufferValue(tempPos);
     if ((tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount)
