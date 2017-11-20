@@ -121,6 +121,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getInventoryChanges") {
                 performGetInventoryChangesCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "placeTile") {
+                performPlaceTileCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -326,6 +329,13 @@ function performRemoveTileCommand(command, player, commandList) {
 function performGetInventoryChangesCommand(command, player, commandList) {
     var tempInventory = player.inventory;
     if (tempInventory.hasChanged) {
+        addSetInventoryCommand(player.inventory, commandList);
+    }
+}
+
+function performPlaceTileCommand(command, player, commandList) {
+    var tempResult = player.placeTile(command.direction, command.tile);
+    if (!tempResult) {
         addSetInventoryCommand(player.inventory, commandList);
     }
 }

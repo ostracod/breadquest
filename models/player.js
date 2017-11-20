@@ -17,6 +17,7 @@ var tempResource = require("models/chunk");
 var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
 var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
 var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
+var TRAIL_TILE_AMOUNT = tempResource.TRAIL_TILE_AMOUNT;
 
 var playerWalkOffsetList = [
     new Pos(0, -1),
@@ -109,6 +110,21 @@ Player.prototype.removeTile = function(direction) {
     }
     var tempPos = this.getPosInWalkDirection(direction);
     new Crack(tempPos, this.username);
+}
+
+Player.prototype.placeTile = function(direction, tile) {
+    var tempPos = this.getPosInWalkDirection(direction);
+    var tempTile = chunkUtils.getTile(tempPos);
+    if ((tempTile < TRAIL_START_TILE || tempTile >= TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
+            && tempTile != EMPTY_TILE) {
+        return false;
+    }
+    var tempResult = this.inventory.decrementTileCount(tile);
+    if (!tempResult) {
+        return false;
+    }
+    chunkUtils.setTile(tempPos, tile);
+    return true
 }
 
 module.exports = {

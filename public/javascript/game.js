@@ -188,6 +188,14 @@ function addGetInventoryChanges() {
     });
 }
 
+function addPlaceTileCommand(direction, tile) {
+    gameUpdateCommandList.push({
+        commandName: "placeTile",
+        direction: direction,
+        tile: tile
+    });
+}
+
 function performSetLocalPlayerInfoCommand(command) {
     localPlayer.username = command.username;
     localPlayer.avatar = command.avatar;
@@ -449,8 +457,15 @@ Player.prototype.walk = function(direction) {
 
 Player.prototype.placeTile = function(direction) {
     var tempPos = this.getPosInWalkDirection(direction);
-    // TODO: Implement.
-    console.log("Place " + tempPos.toString());
+    var tempInventoryItem = inventoryItemList[selectedInventoryItemIndex];
+    if (tempInventoryItem.count <= 0) {
+        return;
+    }
+    tempInventoryItem.count -= 1;
+    tempInventoryItem.displayCount();
+    var tempTile = tempInventoryItem.tile;
+    setTileBufferValue(tempPos, tempTile);
+    addPlaceTileCommand(direction, tempTile);
 }
 
 Player.prototype.removeTile = function(direction) {
