@@ -14,6 +14,7 @@ var gameUtils = require("utils/game");
 var chunkUtils = require("utils/chunk");
 
 var tempResource = require("models/chunk");
+var EMPTY_TILE = tempResource.EMPTY_TILE;
 var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
 var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
 var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;

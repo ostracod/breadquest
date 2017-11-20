@@ -112,6 +112,15 @@ GameUpdateRequest.prototype.respond = function(data) {
             }
             index += 1;
         }
+        // Repeat unprocessed client-side commands.
+        var index = 0;
+        while (index < gameUpdateCommandList.length) {
+            var tempCommand = gameUpdateCommandList[index];
+            if (tempCommand.commandName == "placeTile") {
+                performPlaceTileCommand(tempCommand);
+            }
+            index += 1;
+        }
     } else {
         alert(data.message);
         hasStopped = true;
@@ -192,7 +201,9 @@ function addPlaceTileCommand(direction, tile) {
     gameUpdateCommandList.push({
         commandName: "placeTile",
         direction: direction,
-        tile: tile
+        tile: tile,
+        // Note: pos is ignored by the server. It is for client-use only.
+        pos: localPlayer.getPosInWalkDirection(direction)
     });
 }
 
@@ -300,6 +311,10 @@ function performSetInventoryCommand(command) {
         }
         index += 1;
     }
+}
+
+function performPlaceTileCommand(command) {
+    setTileBufferValue(command.pos, command.tile);
 }
 
 function Entity(id, pos) {
