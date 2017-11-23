@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <script src="javascript/global.js"></script>
+        <script src="javascript/pos.js"></script>
+        <script src="javascript/sprite.js"></script>
+        <link type="text/css" rel="stylesheet" media="all" href="stylesheets/global.css" />
+    </head>
+    <body>
+        <div id="content">
+            <h2>BREADQUEST</h2>
+            <p>
+                <a href="{{url}}">{{urlLabel}}</a>
+            </p>
+            <h2>LEADERBOARD</h2>
+            <table cellpadding="10">
+                {{#accountList}}
+                <tr>
+                    <td>#{{ordinalNumber}}</td>
+                    <td><canvas id="avatarCanvas{{index}}" width="64" height="64" style="width: 32px; height: 32px;"></canvas></td>
+                    <td><strong>{{username}}</strong></td>
+                    <td>{{breadCount}} Bread</td>
+                </tr>
+                {{/accountList}}
+            </table>
+            <p>
+                <a href="{{url}}">{{urlLabel}}</a>
+            </p>
+        </div>
+        <script>
+
+var avatarList = {{{avatarList}}};
+
+initializeSpriteSheet(function () {
+    var index = 0;
+    while (index < avatarList.length) {
+        var tempAvatar = avatarList[index];
+        var tempCanvas = document.getElementById("avatarCanvas" + index);
+        var tempContext = tempCanvas.getContext("2d");
+        drawSpriteOnContext(tempContext, new Pos(0, 0), 64, tempAvatar);
+        index += 1;
+    }
+});
+
+        </script>
+    </body>
+</html>

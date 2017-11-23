@@ -1,3 +1,4 @@
+
 var express = require("express");
 var router = express.Router();
 var bcrypt = require("bcrypt");
@@ -5,6 +6,9 @@ var pageUtils = require("utils/page.js");
 var accountUtils = require("utils/account.js");
 var gameUtils = require("utils/game.js");
 var app = require("breadQuest");
+
+var tempResource = require("models/chunk");
+var BREAD_TILE = tempResource.BREAD_TILE;
 
 var checkAuthentication = pageUtils.checkAuthentication;
 var serveMessagePage = pageUtils.serveMessagePage;
@@ -71,7 +75,7 @@ router.post("/loginAction", function(req, res, next) {
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
             accountUtils.releaseLock();
             if (error) {
-                reportDatabaseErrorWithJson(error, res);
+                reportDatabaseErrorWithJson(error, req, res);
                 return;
             }
             if (!result) {
@@ -80,7 +84,7 @@ router.post("/loginAction", function(req, res, next) {
             }
             comparePasswordWithHash(tempPassword, result.passwordHash, function(result) {
                 if (!result.success) {
-                    reportDatabaseErrorWithJson(result.error, res);
+                    reportDatabaseErrorWithJson(result.error, req, res);
                     return;
                 }
                 if (!result.isMatch) {
@@ -120,7 +124,7 @@ router.post("/createAccountAction", function(req, res, next) {
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
             if (error) {
                 accountUtils.releaseLock();
-                reportDatabaseErrorWithJson(error, res);
+                reportDatabaseErrorWithJson(error, req, res);
                 return;
             }
             if (result) {
@@ -130,7 +134,7 @@ router.post("/createAccountAction", function(req, res, next) {
             generatePasswordHash(tempPassword, function(result) {
                 if (!result.success) {
                     accountUtils.releaseLock();
-                    reportDatabaseErrorWithJson(result.error, res);
+                    reportDatabaseErrorWithJson(result.error, req, res);
                     return;
                 }
                 var tempPasswordHash = result.hash;
@@ -142,7 +146,7 @@ router.post("/createAccountAction", function(req, res, next) {
                 }, function(error) {
                     accountUtils.releaseLock();
                     if (error) {
-                        reportDatabaseErrorWithJson(error, res);
+                        reportDatabaseErrorWithJson(error, req, res);
                         return;
                     }
                     res.json({success: true});
@@ -164,14 +168,14 @@ router.post("/changePasswordAction", checkAuthentication(JSON_ERROR_OUTPUT), fun
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
             if (error) {
                 accountUtils.releaseLock();
-                reportDatabaseErrorWithJson(error, res);
+                reportDatabaseErrorWithJson(error, req, res);
                 return;
             }
             var tempAccount = result;
             comparePasswordWithHash(tempOldPassword, tempAccount.passwordHash, function(result) {
                 if (!result.success) {
                     accountUtils.releaseLock();
-                    reportDatabaseErrorWithJson(result.error, res);
+                    reportDatabaseErrorWithJson(result.error, req, res);
                     return;
                 }
                 if (!result.isMatch) {
@@ -182,7 +186,7 @@ router.post("/changePasswordAction", checkAuthentication(JSON_ERROR_OUTPUT), fun
                 generatePasswordHash(tempNewPassword, function(result) {
                     if (!result.success) {
                         accountUtils.releaseLock();
-                        reportDatabaseErrorWithJson(result.error, res);
+                        reportDatabaseErrorWithJson(result.error, req, res);
                         return;
                     }
                     var tempPasswordHash = result.hash;
@@ -190,7 +194,7 @@ router.post("/changePasswordAction", checkAuthentication(JSON_ERROR_OUTPUT), fun
                     accountUtils.setAccount(index, tempAccount, function(error) {
                         accountUtils.releaseLock();
                         if (error) {
-                            reportDatabaseErrorWithJson(error, res);
+                            reportDatabaseErrorWithJson(error, req, res);
                             return;
                         }
                         res.json({success: true});
@@ -207,7 +211,7 @@ router.get("/menu", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, n
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
             accountUtils.releaseLock();
             if (error) {
-                reportDatabaseErrorWithPage(error, res);
+                reportDatabaseErrorWithPage(error, req, res);
                 return;
             }
             res.render("menu.html", {
@@ -252,6 +256,35 @@ router.post("/gameUpdate", checkAuthentication(JSON_ERROR_OUTPUT), function(req,
     } else {
         performUpdate();
     }
+});
+
+router.get("/leaderboard", function(req, res, next) {
+    accountUtils.acquireLock(function() {
+        accountUtils.getLeaderboardAccounts(20, function(error, accountList) {
+            accountUtils.releaseLock();
+            if (error) {
+                reportDatabaseErrorWithPage(error, req, res);
+                return;
+            }
+            var tempAvatarList = [];
+            var index = 0;
+            while (index < accountList.length) {
+                var tempAccount = accountList[index];
+                tempAccount.breadCount = accountUtils.getAccountBreadCount(tempAccount);
+                tempAccount.index = index;
+                tempAccount.ordinalNumber = index + 1;
+                tempAvatarList.push(tempAccount.avatar);
+                index += 1;
+            }
+            var tempUrl = pageUtils.generateReturnUrl(req);
+            res.render("leaderboard.html", {
+                accountList: accountList,
+                avatarList: JSON.stringify(tempAvatarList),
+                url: tempUrl.url,
+                urlLabel: tempUrl.urlLabel
+            });
+        });
+    });
 });
 
 module.exports = router;

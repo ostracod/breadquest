@@ -7,23 +7,24 @@ function PageUtils() {
 
 }
 
-PageUtils.prototype.reportDatabaseErrorWithJson = function(error, res) {
+PageUtils.prototype.reportDatabaseErrorWithJson = function(error, req, res) {
     res.json({success: false, message: "An error occurred. Please contact an administrator."});
     console.log(error);
 }
 
-PageUtils.prototype.reportDatabaseErrorWithPage = function(error, res) {
-    pageUtils.serveMessagePage(res, "An error occurred. Please contact an administrator.", "menu", "Return to Main Menu");
+PageUtils.prototype.reportDatabaseErrorWithPage = function(error, req, res) {
+    var tempUrl = this.generateReturnUrl(req);
+    pageUtils.serveMessagePage(res, "An error occurred. Please contact an administrator.", tempUrl.url, tempUrl.urlLabel);
     console.log(error);
 }
 
-PageUtils.prototype.reportDatabaseError = function(error, errorOutput, res) {
+PageUtils.prototype.reportDatabaseError = function(error, errorOutput, req, res) {
     console.log(error);
     if (errorOutput == pageUtils.errorOutput.JSON_ERROR_OUTPUT) {
-        pageUtils.reportDatabaseErrorWithJson(error, res);
+        pageUtils.reportDatabaseErrorWithJson(error, req, res);
     }
     if (errorOutput == pageUtils.errorOutput.PAGE_ERROR_OUTPUT) {
-        pageUtils.reportDatabaseErrorWithPage(error, res);
+        pageUtils.reportDatabaseErrorWithPage(error, req, res);
     }
 }
 
@@ -61,6 +62,20 @@ PageUtils.prototype.serveMessagePage = function(res, message, url, urlLabel) {
 PageUtils.prototype.errorOutput = {
     JSON_ERROR_OUTPUT: 0,
     PAGE_ERROR_OUTPUT: 1
+}
+
+PageUtils.prototype.generateReturnUrl = function(req) {
+    if (req.session.username) {
+        return {
+            url: "/menu",
+            urlLabel: "Return to Main Menu"
+        };
+    } else {
+        return {
+            url: "/login",
+            urlLabel: "Return to Login Page"
+        };
+    }
 }
 
 var pageUtils = new PageUtils();

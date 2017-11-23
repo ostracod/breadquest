@@ -62,11 +62,14 @@ GameUtils.prototype.getNewPlayerRespawnPos = function() {
 }
 
 GameUtils.prototype.performUpdate = function(username, commandList, done) {
-    if (this.hasStopped) {
+    function errorHandler(message) {
         done({
             success: false,
-            message: "The server is scheduled to shut down. Please come back later."
+            message: message
         });
+    }
+    if (this.hasStopped) {
+        errorHandler("The server is scheduled to shut down. Please come back later.");
         return;
     }
     var tempPlayer;
@@ -96,7 +99,7 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             var tempCommand = commandList[index];
             index += 1;
             if (tempCommand.commandName == "startPlaying") {
-                performStartPlayingCommand(tempCommand, tempPlayer, tempCommandList, processNextCommand);
+                performStartPlayingCommand(tempCommand, tempPlayer, tempCommandList, processNextCommand, errorHandler);
                 return;
             }
             if (tempCommand.commandName == "getTiles") {
@@ -146,17 +149,14 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             index += 1;
         }
         if (tempCount >= this.maximumPlayerCount) {
-            done({
-                success: false,
-                message: "The server has reached maximum player capacity. Please come back later."
-            });
+            errorHandler("The server has reached maximum player capacity. Please come back later.");
             return;
         }
         accountUtils.acquireLock(function() {
             accountUtils.findAccountByUsername(username, function(error, index, result) {
                 accountUtils.releaseLock();
                 if (error) {
-                    reportDatabaseErrorWithJson(error, res);
+                    errorHandler("There was a database error. Please try again later.");
                     return;
                 }
                 tempPlayer = new Player(result);
@@ -236,12 +236,12 @@ function addSetInventoryCommand(inventory, commandList) {
     inventory.hasChanged = false;
 }
 
-function performStartPlayingCommand(command, player, commandList, done) {
+function performStartPlayingCommand(command, player, commandList, done, errorHandler) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
             accountUtils.releaseLock();
             if (error) {
-                reportDatabaseErrorWithJson(error, res);
+                errorHandler(error);
                 return;
             }
             addSetLocalPlayerInfoCommand(result, player, commandList);

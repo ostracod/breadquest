@@ -1,6 +1,9 @@
 
 var fs = require("fs");
 
+var tempResource = require("models/chunk");
+var BREAD_TILE = tempResource.BREAD_TILE;
+
 var accountsFilePath = "accounts.txt"
 var accountsFile;
 var accountsFileLock = false;
@@ -149,6 +152,63 @@ AccountUtils.prototype.removeAccount = function(index, done) {
     accountUtils.setAccount(index, {}, function(error) {
         done(error);
     });
+}
+
+AccountUtils.prototype.getLeaderboardAccounts = function(amount, done) {
+    var tempAccountList = [];
+    var tempCount = this.getAccountCount();
+    if (!accountsFileLock) {
+        console.log("Missing lock!");
+        return;
+    }
+    function filterLeaderboardAccounts() {
+        function compareAccounts(account1, account2) {
+            var tempBreadCount1 = accountUtils.getAccountBreadCount(account1);
+            var tempBreadCount2 = accountUtils.getAccountBreadCount(account2);
+            if (tempBreadCount1 > tempBreadCount2) {
+                return -1;
+            }
+            if (tempBreadCount1 < tempBreadCount2) {
+                return 1;
+            }
+            return 0;
+        }
+        tempAccountList.sort(compareAccounts);
+        if (tempAccountList.length > amount) {
+            tempAccountList.length = amount;
+        }
+        done(null, tempAccountList);
+    }
+    var tempCount = this.getAccountCount();
+    var index = 0;
+    function processNextAccount() {
+        if (index >= tempCount) {
+            filterLeaderboardAccounts();
+            return;
+        }
+        accountUtils.getAccount(index, function(error, account) {
+            if (error) {
+                done(error, null);
+                return;
+            }
+            if ("username" in account) {
+                tempAccountList.push(account);
+            }
+            index += 1;
+            processNextAccount();
+        });
+    }
+    processNextAccount();
+}
+
+AccountUtils.prototype.getAccountBreadCount = function(account) {
+    if (!("inventory" in account)) {
+        return 0;
+    }
+    if (!(BREAD_TILE in account.inventory)) {
+        return 0;
+    }
+    return account.inventory[BREAD_TILE];
 }
 
 var accountUtils = new AccountUtils();
