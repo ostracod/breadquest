@@ -1,6 +1,9 @@
 
 var classUtils = require("utils/class");
-var Pos = require("models/pos").Pos;
+
+var tempResource = require("models/pos");
+var Pos = tempResource.Pos;
+var createPosFromJson = tempResource.createPosFromJson;
 
 var tempResource = require("models/entity");
 var Entity = tempResource.Entity;
@@ -34,7 +37,12 @@ var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
 
 function Player(account) {
     this.respawnPos = gameUtils.getNewPlayerRespawnPos();
-    var tempPos = this.respawnPos.copy();
+    var tempPos;
+    if ("pos" in account) {
+        tempPos = createPosFromJson(account.pos);
+    } else {
+        tempPos = this.respawnPos.copy();
+    }
     Entity.call(this, tempPos);
     this.username = account.username;
     this.avatar = account.avatar;
@@ -67,14 +75,15 @@ Player.prototype.remove = function() {
 Player.prototype.persist = function(done) {
     var self = this;
     accountUtils.acquireLock(function() {
-        accountUtils.findAccountByUsername(self.username, function(error, index, result) {
+        accountUtils.findAccountByUsername(self.username, function(error, index, account) {
             if (error) {
                 accountUtils.releaseLock();
                 console.log(error);
                 return;
             }
-            result.inventory = self.inventory.toJson();
-            accountUtils.setAccount(index, result, function(error) {
+            account.inventory = self.inventory.toJson();
+            account.pos = self.pos.toJson();
+            accountUtils.setAccount(index, account, function(error) {
                 accountUtils.releaseLock();
                 if (error) {
                     console.log(error);
