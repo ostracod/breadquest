@@ -205,3 +205,36 @@ ChunkUtils.prototype.persistAllChunks = function() {
         index += 1;
     }
 }
+
+ChunkUtils.prototype.removeChunk = function(chunk) {
+    chunk.removeEvent();
+    var index = this.chunkList.indexOf(chunk);
+    if (index >= 0) {
+        this.chunkList.splice(index, 1);
+    }
+    this.persistChunk(chunk);
+}
+
+ChunkUtils.prototype.removeFarChunks = function(posList, maximumDistance) {
+    var tempChunkListToRemove = this.chunkList.slice();
+    var index = 0;
+    while (index < posList.length) {
+        var tempPos = posList[index];
+        var tempIndex = tempChunkListToRemove.length - 1;
+        while (tempIndex >= 0) {
+            var tempChunk = tempChunkListToRemove[tempIndex];
+            var tempDistance = tempChunk.getOrthogonalDistance(tempPos);
+            if (tempDistance <= maximumDistance) {
+                tempChunkListToRemove.splice(tempIndex, 1);
+            }
+            tempIndex -= 1;
+        }
+        index += 1;
+    }
+    var index = 0;
+    while (index < tempChunkListToRemove.length) {
+        var tempChunk = tempChunkListToRemove[index];
+        this.removeChunk(tempChunk);
+        index += 1;
+    }
+}

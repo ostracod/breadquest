@@ -27,6 +27,7 @@ var framesPerSecond = 20;
 var hasStopped = false;
 var maximumPlayerCount = 15;
 var persistDelay = 60 * framesPerSecond;
+var removeFarChunksDelay = 0;
 var isPersistingEverything = false;
 
 GameUtils.prototype.getPlayerByUsername = function(username) {
@@ -399,6 +400,20 @@ function gameTimerEvent() {
         gameUtils.persistEverything(function() {
             // Do nothing.
         });
+    }
+    removeFarChunksDelay -= 1;
+    if (removeFarChunksDelay <= 0) {
+        removeFarChunksDelay = 20 * framesPerSecond;
+        var tempPosList = [];
+        var index = 0;
+        while (index < entityList.length) {
+            var tempEntity = entityList[index];
+            if (classUtils.isInstanceOf(tempEntity, Player)) {
+                tempPosList.push(tempEntity.pos);
+            }
+            index += 1;
+        }
+        chunkUtils.removeFarChunks(tempPosList, 60);
     }
 }
 

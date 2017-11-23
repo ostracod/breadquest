@@ -202,3 +202,19 @@ Chunk.prototype.setHeightMapValue = function(pos, offset, value) {
     this.isDirty = true;
 }
 
+Chunk.prototype.getOrthogonalDistance = function(pos) {
+    var tempPos = this.pos.copy();
+    var tempHalfChunkSize = Math.round(chunkSize / 2);
+    tempPos.x += tempHalfChunkSize;
+    tempPos.y += tempHalfChunkSize;
+    var output = pos.getOrthogonalDistance(tempPos) - tempHalfChunkSize;
+    if (output < 0) {
+        output = 0;
+    }
+    return output;
+}
+
+// Called before the chunk is removed and persisted.
+Chunk.prototype.removeEvent = function() {
+    console.log("Removing chunk at " + this.pos + ".");
+}
