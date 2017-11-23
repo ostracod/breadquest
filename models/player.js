@@ -29,6 +29,8 @@ var BREAD_TILE = tempResource.BREAD_TILE;
 var OVEN_TILE = tempResource.OVEN_TILE;
 var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
 
+var breadIngredientSet = [FLOUR_TILE, WATER_TILE, POWDER_TILE];
+
 var playerWalkOffsetList = [
     new Pos(0, -1),
     new Pos(1, 0),
@@ -116,6 +118,50 @@ Player.prototype.getPosInWalkDirection = function(direction) {
     return output;
 }
 
+Player.prototype.bakeBread = function() {
+    while (true) {
+        var tempCanBakeBread = true;
+        var index = 0;
+        while (index < breadIngredientSet.length) {
+            var tempTile = breadIngredientSet[index];
+            if (this.inventory.getTileCount(tempTile) <= 0) {
+                tempCanBakeBread = false;
+                break;
+            }
+            index += 1;
+        }
+        if (!tempCanBakeBread) {
+            break;
+        }
+        var index = 0;
+        while (index < breadIngredientSet.length) {
+            var tempTile = breadIngredientSet[index];
+            this.inventory.decrementTileCount(tempTile);
+            index += 1;
+        }
+        this.inventory.incrementTileCount(BREAD_TILE);
+    }
+}
+
+Player.prototype.interactWithAdjacentTile = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
+    var tempTile = chunkUtils.getTile(tempPos);
+    if (tempTile == OVEN_TILE) {
+        this.bakeBread();
+    }
+    if (tempTile == HOSPITAL_TILE) {
+        // TODO: Heal.
+    }
+}
+
+Player.prototype.interactWithAdjacentTiles = function() {
+    var tempDirection = 0;
+    while (tempDirection < playerWalkOffsetList.length) {
+        this.interactWithAdjacentTile(tempDirection);
+        tempDirection += 1;
+    }
+}
+
 Player.prototype.walk = function(direction) {
     var tempCost = (1 / 16) * gameUtils.framesPerSecond;
     if (this.walkBudget < tempCost) {
@@ -140,6 +186,7 @@ Player.prototype.walk = function(direction) {
         chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
         this.inventory.incrementTileCount(tempTile);
     }
+    this.interactWithAdjacentTiles();
 }
 
 Player.prototype.removeTile = function(direction) {
