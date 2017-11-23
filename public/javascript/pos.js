@@ -32,6 +32,10 @@ Pos.prototype.equals = function(pos) {
     return (this.x == pos.x && this.y == pos.y);
 }
 
+Pos.prototype.getDistance = function(pos) {
+    return Math.sqrt(Math.pow(this.x - pos.x, 2) + Math.pow(this.y - pos.y, 2));
+}
+
 Pos.prototype.getOrthogonalDistance = function(pos) {
     var tempDistanceX = Math.abs(this.x - pos.x);
     var tempDistanceY = Math.abs(this.y - pos.y);

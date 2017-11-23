@@ -1134,6 +1134,8 @@ function timerEvent() {
     }
     
     document.getElementById("coordinates").innerHTML = localPlayer.pos.toString();
+    var tempDistance = Math.round(localPlayer.pos.getDistance(respawnPos));
+    document.getElementById("respawnPosDistance").innerHTML = tempDistance;
     
 }
 
