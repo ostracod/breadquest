@@ -245,11 +245,13 @@ function performStartPlayingCommand(command, player, commandList, done) {
 }
 
 function performGetTilesCommand(command, player, commandList) {
-    var tempPos = createPosFromJson(command.pos);
     var tempSize = command.size;
     if (tempSize > 50) {
         return;
     }
+    var tempPos = player.pos.copy();
+    tempPos.x -= Math.floor(tempSize / 2);
+    tempPos.y -= Math.floor(tempSize / 2);
     var tempTileList = chunkUtils.getTiles(tempPos, tempSize);
     addSetTilesCommand(tempPos, tempSize, tempTileList, commandList);
 }

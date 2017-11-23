@@ -140,8 +140,7 @@ function addStartPlayingCommand() {
 function addGetTilesCommand() {
     gameUpdateCommandList.push({
         commandName: "getTiles",
-        pos: cameraPos.toJson(),
-        size: canvasSpriteSize
+        size: canvasSpriteSize + 15
     });
 }
 
