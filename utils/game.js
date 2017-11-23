@@ -74,8 +74,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
         index = 0;
         processNextCommand();
     }
+    var self = this;
     function processNextCommand() {
-        if (this.isPersistingEverything) {
+        if (self.isPersistingEverything) {
             setTimeout(processNextCommand, 100);
             return;
         }
@@ -349,11 +350,12 @@ GameUtils.prototype.persistEverything = function(done) {
     console.log("Saving world state...");
     this.isPersistingEverything = true;
     chunkUtils.persistAllChunks();
+    var self = this;
     var index = 0;
     function persistNextEntity() {
         while (true) {
             if (index >= entityList.length) {
-                this.isPersistingEverything = false;
+                self.isPersistingEverything = false;
                 console.log("Saved world state.");
                 done();
                 return;

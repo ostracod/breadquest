@@ -116,7 +116,10 @@ Player.prototype.walk = function(direction) {
         return;
     }
     this.pos.set(tempPos);
-    chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
+    if ((tempTile >= TRAIL_START_TILE && tempTile < TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
+            || tempTile == EMPTY_TILE) {
+        chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
+    }
 }
 
 Player.prototype.removeTile = function(direction) {

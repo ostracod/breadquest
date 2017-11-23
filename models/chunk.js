@@ -9,6 +9,10 @@ var BLOCK_START_TILE = 129;
 var BLOCK_TILE_AMOUNT = 8;
 var TRAIL_START_TILE = 137;
 var TRAIL_TILE_AMOUNT = 8;
+var FLOUR_TILE = 145;
+var WATER_TILE = 146;
+var POWDER_TILE = 147;
+var BREAD_TILE = 148;
 
 var TERRAIN_INCLUSION_RESOLUTION = 8;
 var TERRAIN_COLOR_RESOLUTION = 16;
@@ -69,7 +73,11 @@ Chunk.prototype.generateTile = function(pos) {
             tempTile = BLOCK_START_TILE;
         }
     } else {
-        tempTile = EMPTY_TILE;
+        if (Math.random() < 0.01) {
+            tempTile = FLOUR_TILE + Math.floor(Math.random() * 3);
+        } else {
+            tempTile = EMPTY_TILE;
+        }
     }
     this.setTile(pos, tempTile);
     return tempTile;

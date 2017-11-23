@@ -36,6 +36,10 @@ var blockStartTile = 129;
 var blockTileAmount = 8;
 var trailStartTile = 137;
 var trailTileAmount = 8;
+var flourTile = 145;
+var waterTile = 146;
+var powderTile = 147;
+var breadTile = 148;
 var entityList = [];
 var localPlayer;
 var playerWalkOffsetList = [
@@ -841,6 +845,9 @@ function drawTileOnContext(context, pos, size, which) {
     }
     if (which >= trailStartTile && which < trailStartTile + trailTileAmount) {
         drawSquareOnContext(context, pos, size, which - trailStartTile + 10, true);
+    }
+    if (which >= flourTile && which <= breadTile) {
+        drawSpriteOnContext(context, pos, size, which - flourTile + 32);
     }
 }
 
