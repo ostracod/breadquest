@@ -40,6 +40,8 @@ var flourTile = 145;
 var waterTile = 146;
 var powderTile = 147;
 var breadTile = 148;
+var ovenTile = 149;
+var hospitalTile = 150;
 var entityList = [];
 var localPlayer;
 var playerWalkOffsetList = [
@@ -879,6 +881,12 @@ function drawTileOnContext(context, pos, size, which) {
     }
     if (which >= flourTile && which <= breadTile) {
         drawSpriteOnContext(context, pos, size, which - flourTile + 32);
+    }
+    if (which == ovenTile) {
+        drawSpriteOnContext(context, pos, size, 16);
+    }
+    if (which == hospitalTile) {
+        drawSpriteOnContext(context, pos, size, 17);
     }
 }
 

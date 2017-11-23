@@ -33,7 +33,9 @@ var playerWalkOffsetList = [
 var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
 
 function Player(account) {
-    Entity.call(this, new Pos(0, 0));
+    this.respawnPos = gameUtils.getNewPlayerRespawnPos();
+    var tempPos = this.respawnPos.copy();
+    Entity.call(this, tempPos);
     this.username = account.username;
     this.avatar = account.avatar;
     var tempDate = new Date();

@@ -56,6 +56,11 @@ GameUtils.prototype.getCrackByUsername = function(username) {
     return null;
 }
 
+GameUtils.prototype.getNewPlayerRespawnPos = function() {
+    var tempChunk = chunkUtils.getChunk(new Pos(0, 0));
+    return tempChunk.getRestZonePos();
+}
+
 GameUtils.prototype.performUpdate = function(username, commandList, done) {
     if (this.hasStopped) {
         done({

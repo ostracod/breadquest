@@ -1,6 +1,9 @@
 
 var chunkSize = 128;
 var chunkTileLength = 3;
+var restZoneTileOffset = 2;
+
+var REST_ZONE_RADIUS = 8;
 
 var INCLUSION_HEIGHT_MAP_OFFSET = 0;
 var COLOR_HEIGHT_MAP_OFFSET = 1;
@@ -13,6 +16,8 @@ var FLOUR_TILE = 145;
 var WATER_TILE = 146;
 var POWDER_TILE = 147;
 var BREAD_TILE = 148;
+var OVEN_TILE = 149;
+var HOSPITAL_TILE = 150;
 
 var TERRAIN_INCLUSION_RESOLUTION = 8;
 var TERRAIN_COLOR_RESOLUTION = 16;
@@ -24,12 +29,14 @@ function Chunk(pos, data) {
     this.pos = pos;
     this.data = data;
     this.isDirty = false;
+    this.populateRestZonePos();
 }
 
 module.exports = {
     Chunk: Chunk,
     chunkSize: chunkSize,
     chunkTileLength: chunkTileLength,
+    REST_ZONE_RADIUS: REST_ZONE_RADIUS,
     COLOR_HEIGHT_MAP_OFFSET: COLOR_HEIGHT_MAP_OFFSET,
     INCLUSION_HEIGHT_MAP_OFFSET: INCLUSION_HEIGHT_MAP_OFFSET,
     EMPTY_TILE: EMPTY_TILE,
@@ -40,7 +47,9 @@ module.exports = {
     FLOUR_TILE: FLOUR_TILE,
     WATER_TILE: WATER_TILE,
     POWDER_TILE: POWDER_TILE,
-    BREAD_TILE: BREAD_TILE
+    BREAD_TILE: BREAD_TILE,
+    OVEN_TILE: OVEN_TILE,
+    HOSPITAL_TILE: HOSPITAL_TILE
 }
 
 var Pos = require("models/pos").Pos;
@@ -59,6 +68,58 @@ var tempTerrainOffsetSet2 = [
     new Pos(1, 1),
     new Pos(-1, 1)
 ];
+
+Chunk.prototype.populateRestZonePos = function() {
+    this.restZonePos = null;
+    if (!this.hasGeneratedTiles()) {
+        return;
+    }
+    var tempPos = new Pos(0, 0);
+    var tempOffset = new Pos(0, 0);
+    while (tempOffset.y < chunkSize) {
+        tempPos.set(this.pos);
+        tempPos.add(tempOffset);
+        var tempTile = this.getTile(tempPos);
+        if (tempTile == OVEN_TILE) {
+            this.restZonePos = tempPos.copy();
+            this.restZonePos.x += restZoneTileOffset;
+            break;
+        }
+        tempOffset.x += 1;
+        if (tempOffset.x >= chunkSize) {
+            tempOffset.x = 0;
+            tempOffset.y += 1;
+        }
+    }
+}
+
+Chunk.prototype.addRestZone = function() {
+    if (this.restZonePos !== null) {
+        return;
+    }
+    var tempMargin = REST_ZONE_RADIUS + 5;
+    this.restZonePos = new Pos(
+        tempMargin + Math.floor(Math.random() * (chunkSize - tempMargin * 2)),
+        tempMargin + Math.floor(Math.random() * (chunkSize - tempMargin * 2))
+    );
+    this.restZonePos.add(this.pos);
+    var tempPos = this.restZonePos.copy();
+    tempPos.x -= restZoneTileOffset;
+    this.setTile(tempPos, OVEN_TILE);
+    tempPos.x += restZoneTileOffset * 2;
+    this.setTile(tempPos, HOSPITAL_TILE);
+}
+
+Chunk.prototype.getRestZonePos = function(pos) {
+    if (!this.hasGeneratedTiles()) {
+        this.generateAllTiles();
+    }
+    if (this.restZonePos === null) {
+        return this.restZonePos;
+    } else {
+        return this.restZonePos.copy();
+    }
+}
 
 Chunk.prototype.hasGeneratedTiles = function() {
     return (this.data[0] != 0);
@@ -175,6 +236,9 @@ Chunk.prototype.generateAllTiles = function() {
             tempOffset.x = 0;
             tempOffset.y += 1;
         }
+    }
+    if ((this.pos.x == 0 && this.pos.y == 0) || Math.random() < 1 / (15 * 15)) {
+        this.addRestZone();
     }
     chunkUtils.persistAllChunks();
 }
