@@ -40,7 +40,11 @@ var playerWalkOffsetList = [
 var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
 
 function Player(account) {
-    this.respawnPos = gameUtils.getNewPlayerRespawnPos();
+    if ("respawnPos" in account) {
+        this.respawnPos = createPosFromJson(account.respawnPos);
+    } else {
+        this.respawnPos = gameUtils.getNewPlayerRespawnPos();
+    }
     var tempPos;
     if ("pos" in account) {
         tempPos = createPosFromJson(account.pos);
@@ -86,6 +90,7 @@ Player.prototype.persist = function(done) {
                 return;
             }
             account.inventory = self.inventory.toJson();
+            account.respawnPos = self.respawnPos.toJson();
             account.pos = self.pos.toJson();
             accountUtils.setAccount(index, account, function(error) {
                 accountUtils.releaseLock();

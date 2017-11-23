@@ -7,7 +7,7 @@ var BREAD_TILE = tempResource.BREAD_TILE;
 var accountsFilePath = "accounts.txt"
 var accountsFile;
 var accountsFileLock = false;
-var accountEntryLength = 1000;
+var accountEntryLength = 2000;
 
 if (!fs.existsSync(accountsFilePath)) {
     var tempFile = fs.openSync(accountsFilePath, "w");
