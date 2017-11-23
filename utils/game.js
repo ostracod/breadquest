@@ -1,6 +1,11 @@
 
 function GameUtils() {
-
+    this.framesPerSecond = 20;
+    this.hasStopped = false;
+    this.maximumPlayerCount = 15;
+    this.persistDelay = 60 * this.framesPerSecond;
+    this.removeFarChunksDelay = 0;
+    this.isPersistingEverything = false;
 }
 
 var gameUtils = new GameUtils();
@@ -22,13 +27,6 @@ var Crack = require("models/crack").Crack;
 var classUtils = require("utils/class.js");
 var accountUtils = require("utils/account.js");
 var chunkUtils = require("utils/chunk.js");
-
-var framesPerSecond = 20;
-var hasStopped = false;
-var maximumPlayerCount = 15;
-var persistDelay = 60 * framesPerSecond;
-var removeFarChunksDelay = 0;
-var isPersistingEverything = false;
 
 GameUtils.prototype.getPlayerByUsername = function(username) {
     var index = 0;
@@ -59,7 +57,7 @@ GameUtils.prototype.getCrackByUsername = function(username) {
 }
 
 GameUtils.prototype.performUpdate = function(username, commandList, done) {
-    if (hasStopped) {
+    if (this.hasStopped) {
         done({
             success: false,
             message: "The server is scheduled to shut down. Please come back later."
@@ -77,7 +75,7 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
         processNextCommand();
     }
     function processNextCommand() {
-        if (isPersistingEverything) {
+        if (this.isPersistingEverything) {
             setTimeout(processNextCommand, 100);
             return;
         }
@@ -138,7 +136,7 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             }
             index += 1;
         }
-        if (tempCount >= maximumPlayerCount) {
+        if (tempCount >= this.maximumPlayerCount) {
             done({
                 success: false,
                 message: "The server has reached maximum player capacity. Please come back later."
@@ -344,18 +342,18 @@ function performPlaceTileCommand(command, player, commandList) {
 }
 
 GameUtils.prototype.persistEverything = function(done) {
-    if (isPersistingEverything) {
+    if (this.isPersistingEverything) {
         done();
         return;
     }
     console.log("Saving world state...");
-    isPersistingEverything = true;
+    this.isPersistingEverything = true;
     chunkUtils.persistAllChunks();
     var index = 0;
     function persistNextEntity() {
         while (true) {
             if (index >= entityList.length) {
-                isPersistingEverything = false;
+                this.isPersistingEverything = false;
                 console.log("Saved world state.");
                 done();
                 return;
@@ -382,12 +380,12 @@ process.on("SIGUSR1", exitEvent);
 process.on("SIGUSR2", exitEvent);
 
 GameUtils.prototype.stopGame = function(done) {
-    hasStopped = true;
+    this.hasStopped = true;
     this.persistEverything(done);
 }
 
-function gameTimerEvent() {
-    if (hasStopped || isPersistingEverything) {
+GameUtils.prototype.gameTimerEvent = function() {
+    if (this.hasStopped || this.isPersistingEverything) {
         return;
     }
     var index = entityList.length - 1;
@@ -396,16 +394,16 @@ function gameTimerEvent() {
         tempEntity.tick();
         index -= 1;
     }
-    persistDelay -= 1;
-    if (persistDelay <= 0) {
-        persistDelay = 60 * framesPerSecond;
+    this.persistDelay -= 1;
+    if (this.persistDelay <= 0) {
+        this.persistDelay = 60 * this.framesPerSecond;
         gameUtils.persistEverything(function() {
             // Do nothing.
         });
     }
-    removeFarChunksDelay -= 1;
-    if (removeFarChunksDelay <= 0) {
-        removeFarChunksDelay = 20 * framesPerSecond;
+    this.removeFarChunksDelay -= 1;
+    if (this.removeFarChunksDelay <= 0) {
+        this.removeFarChunksDelay = 20 * this.framesPerSecond;
         var tempPosList = [];
         var index = 0;
         while (index < entityList.length) {
@@ -419,4 +417,6 @@ function gameTimerEvent() {
     }
 }
 
-setInterval(gameTimerEvent, 1000 / framesPerSecond);
+setInterval(function() {
+    gameUtils.gameTimerEvent();
+}, 1000 / gameUtils.framesPerSecond);
