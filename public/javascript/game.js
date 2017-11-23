@@ -56,6 +56,7 @@ var localCrack = null;
 var localCrackTile;
 var localCrackExpirationTime;
 var selectedInventoryItemIndex = 0;
+var respawnPos = new Pos(0, 0);
 
 var moduleList = [];
 
@@ -115,6 +116,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             }
             if (tempCommand.commandName == "setInventory") {
                 performSetInventoryCommand(tempCommand);
+            }
+            if (tempCommand.commandName == "setRespawnPos") {
+                performSetRespawnPosCommand(tempCommand);
             }
             index += 1;
         }
@@ -329,6 +333,7 @@ function performSetInventoryCommand(command) {
         index += 1;
     }
     localPlayer.breadCount = getInventoryItemByTile(breadTile).count;
+    document.getElementById("breadCount").innerHTML = localPlayer.breadCount;
 }
 
 function performPlaceTileCommand(command) {
@@ -337,6 +342,11 @@ function performPlaceTileCommand(command) {
 
 function performCollectTileCommand(command) {
     setTileBufferValue(command.pos, emptyTile);
+}
+
+function performSetRespawnPosCommand(command) {
+    respawnPos = command.respawnPos;
+    document.getElementById("respawnPos").innerHTML = createPosFromJson(respawnPos);
 }
 
 function Entity(id, pos) {
@@ -1161,6 +1171,7 @@ function initializeGame() {
     
     var tempModule = new Module("stats");
     tempModule.show();
+    var tempModule = new Module("location");
     var tempModule = new Module("inventory");
     tempModule.show();
     var tempModule = new Module("chat");

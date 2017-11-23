@@ -37,6 +37,7 @@
             <div style="float: left; margin-left: 15px; width: 350px;">
                 <div style="background: #444444; padding-right: 8px; padding-bottom: 8px; border-radius: 15px;">
                     <button id="statsButton" class="moduleButton" onclick="showOrHideModuleByName('stats');">Stats</button>
+                    <button id="locationButton" class="moduleButton" onclick="showOrHideModuleByName('location');">Location</button>
                     <button id="inventoryButton" class="moduleButton" onclick="showOrHideModuleByName('inventory');">Inventory</button>
                     <button id="chatButton" class="moduleButton" onclick="showOrHideModuleByName('chat');">Chat</button>
                     <button id="onlinePlayersButton" class="moduleButton" onclick="showOrHideModuleByName('onlinePlayers');">Players</button>
@@ -61,8 +62,23 @@
                             <div id="hpBar" class="statusBar" style="background: #FF0000;"></div>
                         </div>
                     </div>
+                </div>
+                
+                <div id="locationModule" class="module">
+                    <p>
+                        <div style="float: left;">
+                            <h2>LOCATION</h2>
+                        </div>
+                        <div style="float: right;">
+                            <button class="closeButton" onclick="showOrHideModuleByName('location');">&#xD7;</button>
+                        </div>
+                        <br style="clear: both;" />
+                    </p>
                     <div style="margin-bottom: 5px;">
-                        Coordinates: <span id="coordinates"></span>
+                        Current Location: <span id="coordinates"></span>
+                    </div>
+                    <div style="margin-bottom: 5px;">
+                        Respawn Location: <span id="respawnPos"></span>
                     </div>
                 </div>
                 

@@ -236,6 +236,13 @@ function addSetInventoryCommand(inventory, commandList) {
     inventory.hasChanged = false;
 }
 
+function addSetRespawnPosCommand(player, commandList) {
+    commandList.push({
+        commandName: "setRespawnPos",
+        respawnPos: player.respawnPos
+    });
+}
+
 function performStartPlayingCommand(command, player, commandList, done, errorHandler) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
@@ -246,6 +253,7 @@ function performStartPlayingCommand(command, player, commandList, done, errorHan
             }
             addSetLocalPlayerInfoCommand(result, player, commandList);
             addSetInventoryCommand(player.inventory, commandList);
+            addSetRespawnPosCommand(player, commandList);
             done();
         });
     });
