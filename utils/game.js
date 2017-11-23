@@ -124,6 +124,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "placeTile") {
                 performPlaceTileCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "collectTile") {
+                performCollectTileCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -340,6 +343,10 @@ function performPlaceTileCommand(command, player, commandList) {
     if (!tempResult) {
         addSetInventoryCommand(player.inventory, commandList);
     }
+}
+
+function performCollectTileCommand(command, player, commandList) {
+    player.collectTile(command.direction);
 }
 
 GameUtils.prototype.persistEverything = function(done) {

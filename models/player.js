@@ -150,7 +150,17 @@ Player.prototype.placeTile = function(direction, tile) {
         return false;
     }
     chunkUtils.setTile(tempPos, tile);
-    return true
+    return true;
+}
+
+Player.prototype.collectTile = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
+    var tempTile = chunkUtils.getTile(tempPos);
+    if (tempTile < FLOUR_TILE || tempTile > BREAD_TILE) {
+        return;
+    }
+    this.inventory.incrementTileCount(tempTile);
+    chunkUtils.setTile(tempPos, EMPTY_TILE);
 }
 
 module.exports = {

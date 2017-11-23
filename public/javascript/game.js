@@ -123,6 +123,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "placeTile") {
                 performPlaceTileCommand(tempCommand);
             }
+            if (tempCommand.commandName == "collectTile") {
+                performCollectTileCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -205,6 +208,15 @@ function addPlaceTileCommand(direction, tile) {
         commandName: "placeTile",
         direction: direction,
         tile: tile,
+        // Note: pos is ignored by the server. It is for client-use only.
+        pos: localPlayer.getPosInWalkDirection(direction)
+    });
+}
+
+function addCollectTileCommand(direction) {
+    gameUpdateCommandList.push({
+        commandName: "collectTile",
+        direction: direction,
         // Note: pos is ignored by the server. It is for client-use only.
         pos: localPlayer.getPosInWalkDirection(direction)
     });
@@ -318,6 +330,10 @@ function performSetInventoryCommand(command) {
 
 function performPlaceTileCommand(command) {
     setTileBufferValue(command.pos, command.tile);
+}
+
+function performCollectTileCommand(command) {
+    setTileBufferValue(command.pos, emptyTile);
 }
 
 function Entity(id, pos) {
@@ -514,11 +530,20 @@ Player.prototype.removeTile = function(direction) {
     addRemoveTileCommand(direction);
 }
 
+Player.prototype.collectTile = function(direction) {
+    var tempPos = this.getPosInWalkDirection(direction);
+    setTileBufferValue(tempPos, emptyTile);
+    addCollectTileCommand(direction);
+}
+
 Player.prototype.placeOrRemoveTile = function(direction) {
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = getTileBufferValue(tempPos);
     if (tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount) {
         this.removeTile(direction);
+    }
+    if (tempTile >= flourTile && tempTile <= breadTile) {
+        this.collectTile(direction);
     }
     if (tempTile == emptyTile
             || (tempTile >= trailStartTile && tempTile < trailStartTile + trailTileAmount)) {
