@@ -135,6 +135,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "collectTile") {
                 performCollectTileCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "getRespawnPosChanges") {
+                performGetRespawnPosChangesCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -360,6 +363,13 @@ function performPlaceTileCommand(command, player, commandList) {
 
 function performCollectTileCommand(command, player, commandList) {
     player.collectTile(command.direction);
+}
+
+function performGetRespawnPosChangesCommand(command, player, commandList) {
+    if (player.respawnPosHasChanged) {
+        addSetRespawnPosCommand(player, commandList);
+        player.respawnPosHasChanged = false;
+    }
 }
 
 GameUtils.prototype.persistEverything = function(done) {

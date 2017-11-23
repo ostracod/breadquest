@@ -45,6 +45,7 @@ function Player(account) {
     } else {
         this.respawnPos = gameUtils.getNewPlayerRespawnPos();
     }
+    this.respawnPosHasChanged = false;
     var tempPos;
     if ("pos" in account) {
         tempPos = createPosFromJson(account.pos);
@@ -61,6 +62,11 @@ function Player(account) {
     this.walkBudget = maximumWalkBudget;
 }
 classUtils.setParentClass(Player, Entity);
+
+Player.prototype.setRespawnPos = function(pos) {
+    this.respawnPos = pos.copy();
+    this.respawnPosHasChanged = true;
+}
 
 Player.prototype.tick = function() {
     Entity.prototype.tick.call(this);
@@ -152,9 +158,12 @@ Player.prototype.interactWithAdjacentTile = function(direction) {
     var tempTile = chunkUtils.getTile(tempPos);
     if (tempTile == OVEN_TILE) {
         this.bakeBread();
+        this.setRespawnPos(this.pos.copy());
     }
     if (tempTile == HOSPITAL_TILE) {
         // TODO: Heal.
+        
+        this.setRespawnPos(this.pos.copy());
     }
 }
 

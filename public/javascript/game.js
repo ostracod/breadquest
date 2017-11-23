@@ -205,7 +205,7 @@ function addRemoveTileCommand(direction) {
 
 function addGetInventoryChanges() {
     gameUpdateCommandList.push({
-        commandName: "getInventoryChanges",
+        commandName: "getInventoryChanges"
     });
 }
 
@@ -215,7 +215,7 @@ function addPlaceTileCommand(direction, tile) {
         direction: direction,
         tile: tile,
         // Note: pos is ignored by the server. It is for client-use only.
-        pos: localPlayer.getPosInWalkDirection(direction)
+        pos: localPlayer.getPosInWalkDirection(direction).toJson()
     });
 }
 
@@ -224,7 +224,13 @@ function addCollectTileCommand(direction) {
         commandName: "collectTile",
         direction: direction,
         // Note: pos is ignored by the server. It is for client-use only.
-        pos: localPlayer.getPosInWalkDirection(direction)
+        pos: localPlayer.getPosInWalkDirection(direction).toJson()
+    });
+}
+
+function addGetRespawnPosChanges() {
+    gameUpdateCommandList.push({
+        commandName: "getRespawnPosChanges"
     });
 }
 
@@ -337,11 +343,11 @@ function performSetInventoryCommand(command) {
 }
 
 function performPlaceTileCommand(command) {
-    setTileBufferValue(command.pos, command.tile);
+    setTileBufferValue(createPosFromJson(command.pos), command.tile);
 }
 
 function performCollectTileCommand(command) {
-    setTileBufferValue(command.pos, emptyTile);
+    setTileBufferValue(createPosFromJson(command.pos), emptyTile);
 }
 
 function performSetRespawnPosCommand(command) {
@@ -1090,6 +1096,7 @@ function timerEvent() {
             addGetChatMessagesCommand();
             addGetOnlinePlayersCommand();
             addGetInventoryChanges();
+            addGetRespawnPosChanges();
             new GameUpdateRequest();
         }
     }
