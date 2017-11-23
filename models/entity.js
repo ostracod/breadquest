@@ -1,6 +1,19 @@
 
 var Pos = require("models/pos").Pos;
 
+var tempResource = require("models/chunk");
+var EMPTY_TILE = tempResource.EMPTY_TILE;
+var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
+var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
+var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
+var TRAIL_TILE_AMOUNT = tempResource.TRAIL_TILE_AMOUNT;
+var FLOUR_TILE = tempResource.FLOUR_TILE;
+var WATER_TILE = tempResource.WATER_TILE;
+var POWDER_TILE = tempResource.POWDER_TILE;
+var BREAD_TILE = tempResource.BREAD_TILE;
+var OVEN_TILE = tempResource.OVEN_TILE;
+var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
+
 var entityList = [];
 var nextEntityId = 0;
 
@@ -31,6 +44,13 @@ Entity.prototype.getClientInfo = function() {
     return {
         className: "Entity"
     }
+}
+
+Entity.prototype.canWalkThroughTile = function(tile) {
+    return ((tile < BLOCK_START_TILE || tile >= BLOCK_START_TILE + BLOCK_TILE_AMOUNT)
+            && tile != 0
+            && tile != OVEN_TILE
+            && tile != HOSPITAL_TILE);
 }
 
 module.exports = {

@@ -344,6 +344,13 @@ function Entity(id, pos) {
     entityList.push(this);
 }
 
+Entity.prototype.canWalkThroughTile = function(tile) {
+    return ((tile < blockStartTile || tile >= blockStartTile + blockTileAmount)
+            && tile != 0
+            && tile != ovenTile
+            && tile != hospitalTile);
+}
+
 function InventoryItem(tile, name) {
     this.tile = tile;
     this.name = name;
@@ -498,8 +505,7 @@ Player.prototype.walk = function(direction) {
     }
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = getTileBufferValue(tempPos);
-    if ((tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount)
-            || tempTile == 0) {
+    if (!this.canWalkThroughTile(tempTile)) {
         return;
     }
     this.pos.set(tempPos);

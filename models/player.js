@@ -26,6 +26,8 @@ var FLOUR_TILE = tempResource.FLOUR_TILE;
 var WATER_TILE = tempResource.WATER_TILE;
 var POWDER_TILE = tempResource.POWDER_TILE;
 var BREAD_TILE = tempResource.BREAD_TILE;
+var OVEN_TILE = tempResource.OVEN_TILE;
+var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
 
 var playerWalkOffsetList = [
     new Pos(0, -1),
@@ -126,8 +128,7 @@ Player.prototype.walk = function(direction) {
     }
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = chunkUtils.getTile(tempPos);
-    if ((tempTile >= BLOCK_START_TILE && tempTile < BLOCK_START_TILE + BLOCK_TILE_AMOUNT)
-            || tempTile == 0) {
+    if (!this.canWalkThroughTile(tempTile)) {
         return;
     }
     this.pos.set(tempPos);
