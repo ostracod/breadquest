@@ -270,7 +270,12 @@ router.get("/leaderboard", function(req, res, next) {
             var index = 0;
             while (index < accountList.length) {
                 var tempAccount = accountList[index];
-                tempAccount.breadCount = accountUtils.getAccountBreadCount(tempAccount);
+                var tempPlayer = gameUtils.getPlayerByUsername(tempAccount.username);
+                if (tempPlayer === null) {
+                    tempAccount.breadCount = accountUtils.getAccountBreadCount(tempAccount);
+                } else {
+                    tempAccount.breadCount = tempPlayer.inventory.getTileCount(BREAD_TILE);
+                }
                 tempAccount.index = index;
                 tempAccount.ordinalNumber = index + 1;
                 tempAvatarList.push(tempAccount.avatar);
