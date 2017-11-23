@@ -341,8 +341,10 @@ InventoryItem.prototype.addToModule = function() {
     this.tag.className = "inventoryItem"
     var tempCanvas = document.createElement("canvas");
     var tempSize = 32;
-    tempCanvas.width = tempSize / 2;
-    tempCanvas.height = tempSize / 2;
+    tempCanvas.width = tempSize;
+    tempCanvas.height = tempSize;
+    tempCanvas.style.width = tempSize / 2;
+    tempCanvas.style.height = tempSize / 2;
     this.tag.appendChild(tempCanvas);
     var tempNameLabel = document.createElement("strong");
     tempNameLabel.innerHTML = this.name;
@@ -392,6 +394,10 @@ function selectInventoryItem(index) {
     }
 }
 
+new InventoryItem(flourTile, "Flour");
+new InventoryItem(waterTile, "Water");
+new InventoryItem(powderTile, "Baking Powder");
+new InventoryItem(breadTile, "Bread");
 new InventoryItem(blockStartTile + 0, "Red Block");
 new InventoryItem(blockStartTile + 1, "Orange Block");
 new InventoryItem(blockStartTile + 2, "Yellow Block");

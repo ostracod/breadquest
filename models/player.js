@@ -19,6 +19,10 @@ var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
 var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
 var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
 var TRAIL_TILE_AMOUNT = tempResource.TRAIL_TILE_AMOUNT;
+var FLOUR_TILE = tempResource.FLOUR_TILE;
+var WATER_TILE = tempResource.WATER_TILE;
+var POWDER_TILE = tempResource.POWDER_TILE;
+var BREAD_TILE = tempResource.BREAD_TILE;
 
 var playerWalkOffsetList = [
     new Pos(0, -1),
@@ -119,6 +123,10 @@ Player.prototype.walk = function(direction) {
     if ((tempTile >= TRAIL_START_TILE && tempTile < TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
             || tempTile == EMPTY_TILE) {
         chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
+    }
+    if (tempTile >= FLOUR_TILE && tempTile <= BREAD_TILE) {
+        chunkUtils.setTile(tempPos, TRAIL_START_TILE + this.avatar);
+        this.inventory.incrementTileCount(tempTile);
     }
 }
 
