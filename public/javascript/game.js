@@ -4,6 +4,8 @@ var canvas;
 var context;
 var canvasSpriteSize;
 var canvasSize;
+var compassCanvas;
+var compassContext;
 var framesPerSecond = 16;
 var canvasIsFocused = true;
 var shiftKeyIsHeld = false;
@@ -351,7 +353,7 @@ function performCollectTileCommand(command) {
 }
 
 function performSetRespawnPosCommand(command) {
-    respawnPos = command.respawnPos;
+    respawnPos = createPosFromJson(command.respawnPos);
     document.getElementById("respawnPos").innerHTML = createPosFromJson(respawnPos);
 }
 
@@ -955,6 +957,43 @@ function centerSelectedInventoryItem() {
     document.getElementById("inventoryDiv").scrollTop = tempOffset;
 }
 
+function drawCompass() {
+    var tempDistance = localPlayer.pos.getDistance(respawnPos);
+    var tempOffset;
+    if (tempDistance > 0) {
+        tempOffset = respawnPos.copy();
+        tempOffset.subtract(localPlayer.pos);
+        tempOffset.scale(1 / tempDistance);
+    } else {
+        tempOffset = null;
+    }
+    compassContext.fillStyle = "#FFFFFF";
+    compassContext.fillRect(0, 0, 200, 200);
+    compassContext.fillStyle = "#888888";
+    compassContext.beginPath();
+    compassContext.arc(100, 100, 90, 0, 2 * Math.PI);
+    compassContext.fill();
+    if (tempOffset === null) {
+        compassContext.fillStyle = "#FFFFFF";
+        compassContext.beginPath();
+        compassContext.arc(100, 100, 35, 0, 2 * Math.PI);
+        compassContext.fill();
+    } else {
+        compassContext.strokeStyle = "#FFFFFF";
+        compassContext.lineWidth = 15;
+        compassContext.lineCap = "round";
+        compassContext.beginPath();
+        compassContext.moveTo(100, 100);
+        var tempRadius = 70;
+        compassContext.lineTo(100 + tempRadius * tempOffset.x, 100 + tempRadius * tempOffset.y);
+        compassContext.stroke();
+    }
+    compassContext.fillStyle = "#444444";
+    compassContext.beginPath();
+    compassContext.arc(100, 100, 20, 0, 2 * Math.PI);
+    compassContext.fill();
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -1137,6 +1176,7 @@ function timerEvent() {
     var tempDistance = Math.round(localPlayer.pos.getDistance(respawnPos));
     document.getElementById("respawnPosDistance").innerHTML = tempDistance;
     
+    drawCompass();
 }
 
 function addAllInventoryItemsToMode() {
@@ -1154,6 +1194,8 @@ function initializeGame() {
     
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
+    compassCanvas = document.getElementById("compassCanvas");
+    compassContext = compassCanvas.getContext("2d");
     
     canvasSize = computeCanvasSize();
     canvas.width = canvasSize;
