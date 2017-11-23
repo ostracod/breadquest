@@ -8,6 +8,7 @@ var createPosFromJson = tempResource.createPosFromJson;
 var tempResource = require("models/entity");
 var Entity = tempResource.Entity;
 var entityList = tempResource.entityList;
+var entityWalkOffsetList = tempResource.entityWalkOffsetList;
 
 var Crack = require("models/crack").Crack;
 var Inventory = require("models/inventory").Inventory;
@@ -31,12 +32,6 @@ var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
 
 var breadIngredientSet = [FLOUR_TILE, WATER_TILE, POWDER_TILE];
 
-var playerWalkOffsetList = [
-    new Pos(0, -1),
-    new Pos(1, 0),
-    new Pos(0, 1),
-    new Pos(-1, 0),
-];
 var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
 
 function Player(account) {
@@ -121,13 +116,6 @@ Player.prototype.getClientInfo = function() {
     }
 }
 
-Player.prototype.getPosInWalkDirection = function(direction) {
-    var tempOffset = playerWalkOffsetList[direction];
-    var output = this.pos.copy();
-    output.add(tempOffset);
-    return output;
-}
-
 Player.prototype.bakeBread = function() {
     while (true) {
         var tempCanBakeBread = true;
@@ -169,7 +157,7 @@ Player.prototype.interactWithAdjacentTile = function(direction) {
 
 Player.prototype.interactWithAdjacentTiles = function() {
     var tempDirection = 0;
-    while (tempDirection < playerWalkOffsetList.length) {
+    while (tempDirection < entityWalkOffsetList.length) {
         this.interactWithAdjacentTile(tempDirection);
         tempDirection += 1;
     }

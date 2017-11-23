@@ -46,7 +46,7 @@ var ovenTile = 149;
 var hospitalTile = 150;
 var entityList = [];
 var localPlayer;
-var playerWalkOffsetList = [
+var entityWalkOffsetList = [
     new Pos(0, -1),
     new Pos(1, 0),
     new Pos(0, 1),
@@ -297,6 +297,12 @@ function performAddEntityCommand(command) {
             tempPos,
         );
     }
+    if (tempClassName == "Enemy") {
+        new Enemy(
+            tempEntityInfo.id,
+            tempPos,
+        );
+    }
 }
 
 function performAddChatMessageCommand(command) {
@@ -489,6 +495,24 @@ Entity.prototype.getDisplayPos = function() {
     return output;
 }
 
+Entity.prototype.getPosInWalkDirection = function(direction) {
+    var tempOffset = entityWalkOffsetList[direction];
+    var output = this.pos.copy();
+    output.add(tempOffset);
+    return output;
+}
+
+function Enemy(id, pos) {
+    Entity.call(this, id, pos);
+}
+setParentClass(Enemy, Entity);
+
+Enemy.prototype.draw = function() {
+    Entity.prototype.draw.call(this);
+    var tempPos = this.getDisplayPos().copy();
+    drawSprite(tempPos, 48);
+}
+
 function Player(id, pos, username, avatar, breadCount) {
     Entity.call(this, id, pos);
     this.username = username;
@@ -516,13 +540,6 @@ Player.prototype.draw = function() {
         tempPos.y -= spriteRenderSize / 2;
         drawCenteredText(tempPos, this.username + " (" + this.breadCount + ")");
     }
-}
-
-Player.prototype.getPosInWalkDirection = function(direction) {
-    var tempOffset = playerWalkOffsetList[direction];
-    var output = this.pos.copy();
-    output.add(tempOffset);
-    return output;
 }
 
 Player.prototype.walk = function(direction) {

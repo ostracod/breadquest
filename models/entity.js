@@ -17,6 +17,13 @@ var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
 var entityList = [];
 var nextEntityId = 0;
 
+var entityWalkOffsetList = [
+    new Pos(0, -1),
+    new Pos(1, 0),
+    new Pos(0, 1),
+    new Pos(-1, 0),
+];
+
 function Entity(pos) {
     this.id = nextEntityId;
     nextEntityId += 1;
@@ -53,7 +60,15 @@ Entity.prototype.canWalkThroughTile = function(tile) {
             && tile != HOSPITAL_TILE);
 }
 
+Entity.prototype.getPosInWalkDirection = function(direction) {
+    var tempOffset = entityWalkOffsetList[direction];
+    var output = this.pos.copy();
+    output.add(tempOffset);
+    return output;
+}
+
 module.exports = {
     Entity: Entity,
-    entityList: entityList
+    entityList: entityList,
+    entityWalkOffsetList: entityWalkOffsetList
 }
