@@ -328,6 +328,7 @@ function performSetInventoryCommand(command) {
         }
         index += 1;
     }
+    localPlayer.breadCount = getInventoryItemByTile(breadTile).count;
 }
 
 function performPlaceTileCommand(command) {
@@ -417,6 +418,18 @@ function selectInventoryItem(index) {
         tempInventoryItem.updateBorder();
         index += 1;
     }
+}
+
+function getInventoryItemByTile(tile) {
+    var index = 0;
+    while (index < inventoryItemList.length) {
+        var tempInventoryItem = inventoryItemList[index];
+        if (tempInventoryItem.tile == tile) {
+            return tempInventoryItem;
+        }
+        index += 1;
+    }
+    return null;
 }
 
 new InventoryItem(flourTile, "Flour");

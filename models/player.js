@@ -106,8 +106,7 @@ Player.prototype.getClientInfo = function() {
         pos: this.pos.toJson(),
         username: this.username,
         avatar: this.avatar,
-        // TODO: Populate this.
-        breadCount: 0
+        breadCount: this.inventory.getTileCount(BREAD_TILE)
     }
 }
 
