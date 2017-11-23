@@ -4,7 +4,7 @@ var canvas;
 var context;
 var canvasSpriteSize;
 var canvasSize;
-var framesPerSecond = 20;
+var framesPerSecond = 16;
 var canvasIsFocused = true;
 var shiftKeyIsHeld = false;
 var chatInputIsFocused = false;
@@ -428,12 +428,13 @@ function Player(id, pos, username, avatar, breadCount) {
     this.username = username;
     this.avatar = avatar;
     this.breadCount = breadCount;
+    this.walkDelay = 0;
 }
 setParentClass(Player, Entity);
 
 Player.prototype.tick = function() {
     Entity.prototype.tick.call(this);
-    // Do nothing.
+    this.walkDelay -= 1;
 }
 
 Player.prototype.draw = function() {
@@ -459,6 +460,9 @@ Player.prototype.getPosInWalkDirection = function(direction) {
 }
 
 Player.prototype.walk = function(direction) {
+    if (this.walkDelay > 0) {
+        return;
+    }
     if (this == localPlayer) {
         if (localCrack !== null) {
             return;
@@ -472,6 +476,7 @@ Player.prototype.walk = function(direction) {
     }
     this.pos.set(tempPos);
     addWalkCommand(direction);
+    this.walkDelay = (1 / 8) * framesPerSecond;
 }
 
 Player.prototype.placeTile = function(direction) {

@@ -26,6 +26,7 @@ var playerWalkOffsetList = [
     new Pos(0, 1),
     new Pos(-1, 0),
 ];
+var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
 
 function Player(account) {
     Entity.call(this, new Pos(0, 0));
@@ -35,11 +36,15 @@ function Player(account) {
     this.lastActivityTime = tempDate.getTime();
     this.lastChatMessageId = getNextChatMessageId() - 10;
     this.inventory = new Inventory(account);
+    this.walkBudget = maximumWalkBudget;
 }
 classUtils.setParentClass(Player, Entity);
 
 Player.prototype.tick = function() {
     Entity.prototype.tick.call(this);
+    if (this.walkBudget < maximumWalkBudget) {
+        this.walkBudget += 1;
+    }
     var tempDate = new Date();
     var tempTime = tempDate.getTime();
     if (tempTime > this.lastActivityTime + 10 * 1000) {
@@ -95,6 +100,11 @@ Player.prototype.getPosInWalkDirection = function(direction) {
 }
 
 Player.prototype.walk = function(direction) {
+    var tempCost = (1 / 16) * gameUtils.framesPerSecond;
+    if (this.walkBudget < tempCost) {
+        return;
+    }
+    this.walkBudget -= tempCost;
     var tempCrack = gameUtils.getCrackByUsername(this.username);
     if (tempCrack !== null) {
         return;

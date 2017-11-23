@@ -1,6 +1,6 @@
 
 function GameUtils() {
-    this.framesPerSecond = 20;
+    this.framesPerSecond = 16;
     this.hasStopped = false;
     this.maximumPlayerCount = 15;
     this.persistDelay = 60 * this.framesPerSecond;
