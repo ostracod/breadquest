@@ -72,6 +72,21 @@ GameUtils.prototype.getEntityCountByClass = function(entityClass) {
     return output;
 }
 
+GameUtils.prototype.getEntityCountByClassNearPos = function(entityClass, pos, radius) {
+    var output = 0;
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (classUtils.isInstanceOf(tempEntity, entityClass)) {
+            if (tempEntity.pos.getOrthogonalDistance(pos) <= radius) {
+                output += 1;
+            }
+        }
+        index += 1;
+    }
+    return output;
+}
+
 GameUtils.prototype.getNewPlayerRespawnPos = function() {
     var tempChunk = chunkUtils.getChunk(new Pos(0, 0));
     return tempChunk.getRestZonePos();

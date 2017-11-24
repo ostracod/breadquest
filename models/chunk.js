@@ -53,7 +53,10 @@ module.exports = {
 }
 
 var Pos = require("models/pos").Pos;
+var Player = require("models/enemy").Player;
 var Enemy = require("models/enemy").Enemy;
+var entityList = require("models/entity").entityList;
+var classUtils = require("utils/class");
 var chunkUtils = require("utils/chunk");
 var gameUtils = require("utils/game");
 
@@ -292,16 +295,54 @@ Chunk.prototype.getOrthogonalDistance = function(pos) {
     return output;
 }
 
+Chunk.prototype.posIsInRestZone = function(pos) {
+    if (this.restZonePos === null) {
+        return false;
+    }
+    return (pos.getOrthogonalDistance(this.restZonePos) <= REST_ZONE_RADIUS);
+}
+
 Chunk.prototype.tryToSpawnEnemy = function() {
     var tempOffset = new Pos(Math.floor(Math.random() * chunkSize), Math.floor(Math.random() * chunkSize));
     var tempPos = this.pos.copy();
     tempPos.add(tempOffset);
+    var tempTile = this.getTile(tempPos);
+    if (tempTile != EMPTY_TILE) {
+        return false;
+    }
+    if (this.posIsInRestZone(tempPos)) {
+        return false;
+    }
+    var tempCount = gameUtils.getEntityCountByClassNearPos(Enemy, tempPos, 50);
+    if (tempCount >= 10) {
+        return false;
+    }
+    var tempCount = gameUtils.getEntityCountByClassNearPos(Player, tempPos, 20);
+    if (tempCount >= 1) {
+        return false;
+    }
     console.log("Spawning enemy at " + tempPos.toString());
     new Enemy(tempPos);
     return true;
 }
 
+Chunk.prototype.containsPos = function(pos) {
+    return (pos.x >= this.pos.x && pos.x < this.pos.x + chunkSize
+        && pos.y >= this.pos.y && pos.y < this.pos.y + chunkSize);
+}
+
 // Called before the chunk is removed and persisted.
 Chunk.prototype.removeEvent = function() {
     console.log("Removing chunk at " + this.pos + ".");
+    var index = entityList.length - 1;
+    while (index >= 0) {
+        var tempEntity = entityList[index];
+        if (classUtils.isInstanceOf(tempEntity, Enemy)) {
+            if (this.containsPos(tempEntity.pos)) {
+                console.log("Despawning enemy at " + tempEntity.pos.toString());
+                tempEntity.remove();
+            }
+        }
+        index -= 1;
+    }
 }
