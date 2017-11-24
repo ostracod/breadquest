@@ -71,9 +71,53 @@ Player.prototype.setRespawnPos = function(pos) {
     this.respawnPosHasChanged = true;
 }
 
+Player.prototype.decrementNextItemCount = function(tileList) {
+    var index = 0;
+    while (index < tileList.length) {
+        var tempTile = tileList[index];
+        var tempResult = this.inventory.decrementTileCount(tempTile);
+        if (tempResult) {
+            return tempTile;
+        }
+        index += 1;
+    }
+    return null;
+}
+
+Player.prototype.dropItems = function(tileList) {
+    var tempPos = new Pos(0, 0);
+    var tempRadius = 0;
+    while (true) {
+        var tempHasExhaustedItems = false;
+        var tempOffset = new Pos(-tempRadius, -tempRadius);
+        while (tempOffset.y <= tempRadius) {
+            var tempPos = this.pos.copy();
+            tempPos.add(tempOffset);
+            var tempTile = chunkUtils.getTile(tempPos);
+            if ((tempTile >= TRAIL_START_TILE && tempTile < TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
+                    || tempTile == EMPTY_TILE) {
+                var tempTile = this.decrementNextItemCount(tileList);
+                if (tempTile === null) {
+                    tempHasExhaustedItems = true;
+                    break;
+                }
+                chunkUtils.setTile(tempPos, tempTile);
+            }
+            tempOffset.x += 1;
+            if (tempOffset.x > tempRadius) {
+                tempOffset.x = -tempRadius;
+                tempOffset.y += 1;
+            }
+        }
+        tempRadius += 1;
+        if (tempHasExhaustedItems) {
+            break;
+        }
+    }
+}
+
 Player.prototype.die = function() {
-    // TODO: Drop items.
-    
+    this.dropItems([FLOUR_TILE, WATER_TILE, POWDER_TILE]);
     this.pos = this.respawnPos.copy();
     this.health = maximumPlayerHealth;
 }
