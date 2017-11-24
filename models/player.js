@@ -10,32 +10,6 @@ var Entity = tempResource.Entity;
 var entityList = tempResource.entityList;
 var entityWalkOffsetList = tempResource.entityWalkOffsetList;
 
-var Enemy = require("models/enemy").Enemy;
-var Crack = require("models/crack").Crack;
-var Inventory = require("models/inventory").Inventory;
-var getNextChatMessageId = require("models/chatMessage").getNextChatMessageId;
-var accountUtils = require("utils/account");
-var gameUtils = require("utils/game");
-var chunkUtils = require("utils/chunk");
-
-var tempResource = require("models/chunk");
-var EMPTY_TILE = tempResource.EMPTY_TILE;
-var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
-var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
-var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
-var TRAIL_TILE_AMOUNT = tempResource.TRAIL_TILE_AMOUNT;
-var FLOUR_TILE = tempResource.FLOUR_TILE;
-var WATER_TILE = tempResource.WATER_TILE;
-var POWDER_TILE = tempResource.POWDER_TILE;
-var BREAD_TILE = tempResource.BREAD_TILE;
-var OVEN_TILE = tempResource.OVEN_TILE;
-var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
-
-var breadIngredientSet = [FLOUR_TILE, WATER_TILE, POWDER_TILE];
-
-var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
-var maximumPlayerHealth = 5;
-
 function Player(account) {
     if ("respawnPos" in account) {
         this.respawnPos = createPosFromJson(account.respawnPos);
@@ -74,6 +48,36 @@ function Player(account) {
     }
 }
 classUtils.setParentClass(Player, Entity);
+
+module.exports = {
+    Player: Player
+}
+
+var Enemy = require("models/enemy").Enemy;
+var Crack = require("models/crack").Crack;
+var Inventory = require("models/inventory").Inventory;
+var getNextChatMessageId = require("models/chatMessage").getNextChatMessageId;
+var accountUtils = require("utils/account");
+var gameUtils = require("utils/game");
+var chunkUtils = require("utils/chunk");
+
+var tempResource = require("models/chunk");
+var EMPTY_TILE = tempResource.EMPTY_TILE;
+var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
+var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
+var TRAIL_START_TILE = tempResource.TRAIL_START_TILE;
+var TRAIL_TILE_AMOUNT = tempResource.TRAIL_TILE_AMOUNT;
+var FLOUR_TILE = tempResource.FLOUR_TILE;
+var WATER_TILE = tempResource.WATER_TILE;
+var POWDER_TILE = tempResource.POWDER_TILE;
+var BREAD_TILE = tempResource.BREAD_TILE;
+var OVEN_TILE = tempResource.OVEN_TILE;
+var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
+
+var breadIngredientSet = [FLOUR_TILE, WATER_TILE, POWDER_TILE];
+
+var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
+var maximumPlayerHealth = 5;
 
 Player.prototype.setRespawnPos = function(pos) {
     this.respawnPos = pos.copy();
@@ -328,8 +332,4 @@ Player.prototype.eatBread = function() {
         return;
     }
     this.health += 1;
-}
-
-module.exports = {
-    Player: Player
 }
