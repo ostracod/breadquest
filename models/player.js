@@ -64,6 +64,14 @@ function Player(account) {
         this.health = maximumPlayerHealth;
     }
     this.invincibilityDelay = 0;
+    var tempEnemyList = gameUtils.getEntitiesByClassNearPos(Enemy, this.pos, 10);
+    var index = 0;
+    while (index < tempEnemyList.length) {
+        var tempEnemy = tempEnemyList[index];
+        console.log("Removing enemy at " + tempEnemy.pos.toString() + " near spawning player.");
+        tempEnemy.remove();
+        index += 1;
+    }
 }
 classUtils.setParentClass(Player, Entity);
 

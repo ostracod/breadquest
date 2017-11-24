@@ -321,7 +321,7 @@ Chunk.prototype.tryToSpawnEnemy = function() {
     if (tempCount >= 1) {
         return false;
     }
-    console.log("Spawning enemy at " + tempPos.toString());
+    console.log("Spawning enemy at " + tempPos.toString() + ".");
     new Enemy(tempPos);
     return true;
 }
@@ -333,13 +333,13 @@ Chunk.prototype.containsPos = function(pos) {
 
 // Called before the chunk is removed and persisted.
 Chunk.prototype.removeEvent = function() {
-    console.log("Removing chunk at " + this.pos + ".");
+    console.log("Removing chunk at " + this.pos.toString() + ".");
     var index = entityList.length - 1;
     while (index >= 0) {
         var tempEntity = entityList[index];
         if (classUtils.isInstanceOf(tempEntity, Enemy)) {
             if (this.containsPos(tempEntity.pos)) {
-                console.log("Despawning enemy at " + tempEntity.pos.toString());
+                console.log("Despawning enemy at " + tempEntity.pos.toString() + ".");
                 tempEntity.remove();
             }
         }

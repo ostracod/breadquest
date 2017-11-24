@@ -47,7 +47,7 @@ ENEMIES
 > Enemies should move randomly when idle
 > If an enemy collides with a block while pursuing a player, it should enter idle mode for a short time
 > Enemies should not be able to enter rest zones
-> When a player logs in (after a long period of inactvity), nearby enemies will be removed
+> When a player logs in (after a long period of inactivity), nearby enemies will be removed
 
 ENEMY SPAWNING
 > Enemies should not spawn in rest zones
