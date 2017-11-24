@@ -49,37 +49,45 @@ function processFields() {
         </script>
     </head>
     <body>
-        <div id="content">
-            <h2>BREADQUEST</h2>
-            <p>
-                A game by Jack Eisenmann
-            </p>
-            <h2>LOG IN</h2>
-            <form onsubmit="processFields(); return false;">
-                <table>
-                    <tr>
-                        <td>Username:</td>
-                        <td><input id="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" /></td>
-                    </tr>
-                    <tr>
-                        <td>Password:</td>
-                        <td><input id="password" type="password" /></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input type="submit" /></td>
-                    </tr>
-                </table>
-            </form>
-            <p id="message">
-            
-            </p>
-            <p>
-                <a href="createAccount">Create a New Account</a>
-            </p>
-            <p>
-                <a href="leaderBoard">Leader Board</a>
-            </p>
+        <div id="content" style="width: 680px;">
+            <div style="float: left;">
+                <h2>BREADQUEST</h2>
+                <p>
+                    A game by Jack Eisenmann
+                </p>
+                <h2>LOG IN</h2>
+                <form onsubmit="processFields(); return false;">
+                    <table>
+                        <tr>
+                            <td>Username:</td>
+                            <td><input id="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" /></td>
+                        </tr>
+                        <tr>
+                            <td>Password:</td>
+                            <td><input id="password" type="password" /></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input type="submit" /></td>
+                        </tr>
+                    </table>
+                </form>
+                <p id="message">
+                
+                </p>
+                <p>
+                    <a href="createAccount">Create a New Account</a>
+                </p>
+                <p>
+                    <a href="leaderBoard">Leader Board</a>
+                </p>
+            </div>
+            <div style="float: left; margin-left: 50px;">
+                <p>
+                    <img src="/images/screenshot.png" style="height: 350px;" />
+                </p>
+            </div>
+            <br style="clear: both;" />
         </div>
     </body>
 </html>
