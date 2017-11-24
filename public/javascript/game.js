@@ -26,8 +26,6 @@ var gameUpdateCommandList = []
 var gameUpdateRequestDelay = 0;
 var lastGameUpdateFrameNumber = null;
 var isRequestingGameUpdate = false;
-var localPlayerHp = 0;
-var localPlayerMaximumHp = 5;
 var hasStopped = false;
 var lastActivityTime = 0;
 var colorSet;
@@ -59,6 +57,8 @@ var localCrackTile;
 var localCrackExpirationTime;
 var selectedInventoryItemIndex = 0;
 var respawnPos = new Pos(0, 0);
+var localPlayerMaximumHealth = 5;
+var localPlayerHealth = localPlayerMaximumHealth;
 
 var moduleList = [];
 
@@ -121,6 +121,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             }
             if (tempCommand.commandName == "setRespawnPos") {
                 performSetRespawnPosCommand(tempCommand);
+            }
+            if (tempCommand.commandName == "setStats") {
+                performSetStatsCommand(tempCommand);
             }
             index += 1;
         }
@@ -205,7 +208,7 @@ function addRemoveTileCommand(direction) {
     });
 }
 
-function addGetInventoryChanges() {
+function addGetInventoryChangesCommand() {
     gameUpdateCommandList.push({
         commandName: "getInventoryChanges"
     });
@@ -230,9 +233,15 @@ function addCollectTileCommand(direction) {
     });
 }
 
-function addGetRespawnPosChanges() {
+function addGetRespawnPosChangesCommand() {
     gameUpdateCommandList.push({
         commandName: "getRespawnPosChanges"
+    });
+}
+
+function addGetStatsCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getStats"
     });
 }
 
@@ -361,6 +370,11 @@ function performCollectTileCommand(command) {
 function performSetRespawnPosCommand(command) {
     respawnPos = createPosFromJson(command.respawnPos);
     document.getElementById("respawnPos").innerHTML = createPosFromJson(respawnPos);
+}
+
+function performSetStatsCommand(command) {
+    localPlayerHealth = command.health;
+    document.getElementById("hp").innerHTML = localPlayerHealth;
 }
 
 function Entity(id, pos) {
@@ -1125,13 +1139,6 @@ function timerEvent() {
         index -= 1;
     }
     
-    var index = 0;
-    while (index < barList.length) {
-        var tempBar = barList[index];
-        tempBar.tick();
-        index += 1;
-    }
-    
     if (!spritesImageHasLoaded) {
         return;
     }
@@ -1151,8 +1158,9 @@ function timerEvent() {
             addGetTilesCommand();
             addGetChatMessagesCommand();
             addGetOnlinePlayersCommand();
-            addGetInventoryChanges();
-            addGetRespawnPosChanges();
+            addGetInventoryChangesCommand();
+            addGetRespawnPosChangesCommand();
+            addGetStatsCommand();
             new GameUpdateRequest();
         }
     }
@@ -1196,6 +1204,15 @@ function timerEvent() {
     drawCompass();
 }
 
+function barTimerEvent() {
+    var index = 0;
+    while (index < barList.length) {
+        var tempBar = barList[index];
+        tempBar.tick();
+        index += 1;
+    }
+}
+
 function addAllInventoryItemsToMode() {
     var index = 0;
     while (index < inventoryItemList.length) {
@@ -1228,6 +1245,8 @@ function initializeGame() {
         canvasIsFocused = true;
     }
     
+    document.getElementById("maximumHp").innerHTML = localPlayerMaximumHealth;
+    
     chatInput = document.getElementById("chatInput");
     chatOutput = document.getElementById("chatOutput");
     overlayChatInput = document.getElementById("overlayChatInput");
@@ -1245,7 +1264,7 @@ function initializeGame() {
     var tempModule = new Module("chat");
     var tempModule = new Module("onlinePlayers");
     
-    new Bar(document.getElementById("hpBar"), function() {return localPlayerHp / localPlayerMaximumHp;});
+    new Bar(document.getElementById("hpBar"), function() {return localPlayerHealth / localPlayerMaximumHealth;});
     
     window.onkeydown = keyDownEvent;
     window.onkeyup = keyUpEvent;
@@ -1253,5 +1272,6 @@ function initializeGame() {
     localPlayer = new Player(-1, new Pos(0, 0), null, null, null);
     addStartPlayingCommand();
     
-    setInterval(timerEvent, Math.floor(Math.floor(1000 / framesPerSecond)));
+    setInterval(timerEvent, Math.floor(1000 / framesPerSecond));
+    setInterval(barTimerEvent, Math.floor(1000 / 30));
 }

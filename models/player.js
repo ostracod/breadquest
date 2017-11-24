@@ -33,6 +33,7 @@ var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
 var breadIngredientSet = [FLOUR_TILE, WATER_TILE, POWDER_TILE];
 
 var maximumWalkBudget = 2 * gameUtils.framesPerSecond;
+var maximumPlayerHealth = 5;
 
 function Player(account) {
     if ("respawnPos" in account) {
@@ -55,6 +56,11 @@ function Player(account) {
     this.lastChatMessageId = getNextChatMessageId() - 10;
     this.inventory = new Inventory(account);
     this.walkBudget = maximumWalkBudget;
+    if ("health" in account) {
+        this.health = account.health;
+    } else {
+        this.health = maximumPlayerHealth;
+    }
 }
 classUtils.setParentClass(Player, Entity);
 
@@ -93,6 +99,7 @@ Player.prototype.persist = function(done) {
             account.inventory = self.inventory.toJson();
             account.respawnPos = self.respawnPos.toJson();
             account.pos = self.pos.toJson();
+            account.health = self.health;
             accountUtils.setAccount(index, account, function(error) {
                 accountUtils.releaseLock();
                 if (error) {

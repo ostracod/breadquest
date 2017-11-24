@@ -189,6 +189,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getRespawnPosChanges") {
                 performGetRespawnPosChangesCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "getStats") {
+                performGetStatsCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -286,6 +289,13 @@ function addSetRespawnPosCommand(player, commandList) {
     commandList.push({
         commandName: "setRespawnPos",
         respawnPos: player.respawnPos
+    });
+}
+
+function addSetStatsCommand(player, commandList) {
+    commandList.push({
+        commandName: "setStats",
+        health: player.health
     });
 }
 
@@ -413,6 +423,10 @@ function performGetRespawnPosChangesCommand(command, player, commandList) {
         addSetRespawnPosCommand(player, commandList);
         player.respawnPosHasChanged = false;
     }
+}
+
+function performGetStatsCommand(command, player, commandList) {
+    addSetStatsCommand(player, commandList);
 }
 
 GameUtils.prototype.persistEverything = function(done) {
