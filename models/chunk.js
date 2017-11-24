@@ -53,7 +53,9 @@ module.exports = {
 }
 
 var Pos = require("models/pos").Pos;
+var Enemy = require("models/enemy").Enemy;
 var chunkUtils = require("utils/chunk");
+var gameUtils = require("utils/game");
 
 var tempTerrainOffsetSet1 = [
     new Pos(0, -1),
@@ -288,6 +290,15 @@ Chunk.prototype.getOrthogonalDistance = function(pos) {
         output = 0;
     }
     return output;
+}
+
+Chunk.prototype.tryToSpawnEnemy = function() {
+    var tempOffset = new Pos(Math.floor(Math.random() * chunkSize), Math.floor(Math.random() * chunkSize));
+    var tempPos = this.pos.copy();
+    tempPos.add(tempOffset);
+    console.log("Spawning enemy at " + tempPos.toString());
+    new Enemy(tempPos);
+    return true;
 }
 
 // Called before the chunk is removed and persisted.

@@ -1,6 +1,14 @@
 
 var fs = require("fs");
 
+function AccountUtils() {
+
+}
+
+var accountUtils = new AccountUtils();
+
+module.exports = accountUtils;
+
 var tempResource = require("models/chunk");
 var BREAD_TILE = tempResource.BREAD_TILE;
 
@@ -12,10 +20,6 @@ var accountEntryLength = 2000;
 if (!fs.existsSync(accountsFilePath)) {
     var tempFile = fs.openSync(accountsFilePath, "w");
     fs.closeSync(tempFile);
-}
-
-function AccountUtils() {
-
 }
 
 AccountUtils.prototype.acquireLock = function(done) {
@@ -210,8 +214,4 @@ AccountUtils.prototype.getAccountBreadCount = function(account) {
     }
     return account.inventory[BREAD_TILE];
 }
-
-var accountUtils = new AccountUtils();
-
-module.exports = accountUtils;
 

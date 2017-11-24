@@ -238,3 +238,16 @@ ChunkUtils.prototype.removeFarChunks = function(posList, maximumDistance) {
         index += 1;
     }
 }
+
+ChunkUtils.prototype.getGeneratedChunkList = function() {
+    var output = [];
+    var index = 0;
+    while (index < this.chunkList.length) {
+        var tempChunk = this.chunkList[index];
+        if (tempChunk.hasGeneratedTiles()) {
+            output.push(tempChunk);
+        }
+        index += 1;
+    }
+    return output;
+}

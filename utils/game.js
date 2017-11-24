@@ -5,6 +5,8 @@ function GameUtils() {
     this.maximumPlayerCount = 15;
     this.persistDelay = 60 * this.framesPerSecond;
     this.removeFarChunksDelay = 0;
+    this.enemySpawnDelay = 0;
+    this.enemyToChunkRatio = 10;
     this.isPersistingEverything = false;
 }
 
@@ -23,6 +25,7 @@ var chatMessageList = tempResource.chatMessageList;
 var entityList = require("models/entity").entityList;
 var Player = require("models/player").Player;
 var Crack = require("models/crack").Crack;
+var Enemy = require("models/enemy").Enemy;
 
 var classUtils = require("utils/class.js");
 var accountUtils = require("utils/account.js");
@@ -56,9 +59,42 @@ GameUtils.prototype.getCrackByUsername = function(username) {
     return null;
 }
 
+GameUtils.prototype.getEntityCountByClass = function(entityClass) {
+    var output = 0;
+    var index = 0;
+    while (index < entityList.length) {
+        var tempEntity = entityList[index];
+        if (classUtils.isInstanceOf(tempEntity, entityClass)) {
+            output += 1;
+        }
+        index += 1;
+    }
+    return output;
+}
+
 GameUtils.prototype.getNewPlayerRespawnPos = function() {
     var tempChunk = chunkUtils.getChunk(new Pos(0, 0));
     return tempChunk.getRestZonePos();
+}
+
+GameUtils.prototype.spawnEnemies = function() {
+    var tempChunkList = chunkUtils.getGeneratedChunkList();
+    if (tempChunkList.length <= 0) {
+        return;
+    }
+    console.log("Spawning enemies.");
+    var tempEnemyCount = this.getEntityCountByClass(Enemy);
+    var tempMaximumEnemyCount = tempChunkList.length * this.enemyToChunkRatio;
+    var tempIterationCount = 0;
+    while (tempEnemyCount < tempMaximumEnemyCount && tempIterationCount < 150) {
+        var index = Math.floor(Math.random() * tempChunkList.length);
+        var tempChunk = tempChunkList[index];
+        var tempResult = tempChunk.tryToSpawnEnemy();
+        if (tempResult) {
+            tempEnemyCount += 1;
+        }
+        tempIterationCount += 1;
+    }
 }
 
 GameUtils.prototype.performUpdate = function(username, commandList, done) {
@@ -142,15 +178,7 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
     if (tempPlayer === null) {
-        var tempCount = 0;
-        var index = 0;
-        while (index < entityList.length) {
-            var tempEntity = entityList[index];
-            if (classUtils.isInstanceOf(tempEntity, Player)) {
-                tempCount += 1;
-            }
-            index += 1;
-        }
+        var tempCount = this.getEntityCountByClass(Player);
         if (tempCount >= this.maximumPlayerCount) {
             errorHandler("The server has reached maximum player capacity. Please come back later.");
             return;
@@ -420,6 +448,7 @@ GameUtils.prototype.gameTimerEvent = function() {
     if (this.hasStopped || this.isPersistingEverything) {
         return;
     }
+    
     var index = entityList.length - 1;
     while (index >= 0) {
         var tempEntity = entityList[index];
@@ -446,6 +475,11 @@ GameUtils.prototype.gameTimerEvent = function() {
             index += 1;
         }
         chunkUtils.removeFarChunks(tempPosList, 60);
+    }
+    this.enemySpawnDelay -= 1;
+    if (this.enemySpawnDelay <= 0) {
+        this.enemySpawnDelay = 10 * this.framesPerSecond;
+        this.spawnEnemies();
     }
 }
 
