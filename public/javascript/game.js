@@ -246,6 +246,12 @@ function addGetStatsCommand() {
     });
 }
 
+function addEatBreadCommand() {
+    gameUpdateCommandList.push({
+        commandName: "eatBread"
+    });
+}
+
 function performSetLocalPlayerInfoCommand(command) {
     localPlayer.username = command.username;
     localPlayer.avatar = command.avatar;
@@ -1097,6 +1103,9 @@ function keyDownEvent(event) {
             }
             selectInventoryItem(index);
             centerSelectedInventoryItem();
+        }
+        if (keyCode == 66) {
+            addEatBreadCommand();
         }
         if (keyCode >= 37 && keyCode <= 40) {
             return false;

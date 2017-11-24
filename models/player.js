@@ -305,6 +305,17 @@ Player.prototype.collectTile = function(direction) {
     chunkUtils.setTile(tempPos, EMPTY_TILE);
 }
 
+Player.prototype.eatBread = function() {
+    if (this.health >= maximumPlayerHealth) {
+        return;
+    }
+    var tempResult = this.inventory.decrementTileCount(BREAD_TILE);
+    if (!tempResult) {
+        return;
+    }
+    this.health += 1;
+}
+
 module.exports = {
     Player: Player
 }

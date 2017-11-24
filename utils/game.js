@@ -192,6 +192,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getStats") {
                 performGetStatsCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "eatBread") {
+                performEatBreadCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -428,6 +431,10 @@ function performGetRespawnPosChangesCommand(command, player, commandList) {
 
 function performGetStatsCommand(command, player, commandList) {
     addSetStatsCommand(player, commandList);
+}
+
+function performEatBreadCommand(command, player, commandList) {
+    player.eatBread();
 }
 
 GameUtils.prototype.persistEverything = function(done) {
