@@ -45,7 +45,7 @@ ChunkUtils.prototype.convertPosToFilePos = function(pos) {
     );
 }
 
-ChunkUtils.prototype.getChunk = function(pos) {
+ChunkUtils.prototype.getChunkWithoutGenerating = function(pos) {
     var index = 0;
     while (index < this.chunkList.length) {
         var tempChunk = this.chunkList[index];
@@ -54,7 +54,15 @@ ChunkUtils.prototype.getChunk = function(pos) {
         }
         index += 1;
     }
-    var output = this.loadChunk(pos);
+    return null;
+}
+
+ChunkUtils.prototype.getChunk = function(pos) {
+    var output = this.getChunkWithoutGenerating(pos);
+    if (output !== null) {
+        return output;
+    }
+    output = this.loadChunk(pos);
     this.chunkList.push(output);
     return output;
 }
@@ -140,6 +148,15 @@ ChunkUtils.prototype.getTiles = function(pos, size) {
         }
     }
     return output;
+}
+
+ChunkUtils.prototype.getTileWithoutGenerating = function(pos) {
+    var tempPos = this.convertPosToChunkPos(pos);
+    var tempChunk = this.getChunkWithoutGenerating(tempPos);
+    if (tempChunk === null) {
+        return 0;
+    }
+    return tempChunk.getTileWithoutGenerating(pos);
 }
 
 ChunkUtils.prototype.getTile = function(pos) {
@@ -250,4 +267,13 @@ ChunkUtils.prototype.getGeneratedChunkList = function() {
         index += 1;
     }
     return output;
+}
+
+ChunkUtils.prototype.posIsInRestZone = function(pos) {
+    var tempPos = this.convertPosToChunkPos(pos);
+    var tempChunk = this.getChunkWithoutGenerating(tempPos);
+    if (tempChunk === null) {
+        return false;
+    }
+    return tempChunk.posIsInRestZone(pos);
 }

@@ -254,6 +254,14 @@ Chunk.prototype.convertPosToIndex = function(pos) {
     return (tempOffsetX + tempOffsetY * chunkSize) * chunkTileLength;
 }
 
+Chunk.prototype.getTileWithoutGenerating = function(pos) {
+    if (!this.hasGeneratedTiles()) {
+        return 0;
+    }
+    var index = this.convertPosToIndex(pos);
+    return this.data[index];
+}
+
 Chunk.prototype.getTile = function(pos) {
     if (!this.hasGeneratedTiles()) {
         this.generateAllTiles();
