@@ -130,6 +130,7 @@ router.post("/createAccountAction", function(req, res, next) {
                 return;
             }
             if (result) {
+                accountUtils.releaseLock();
                 res.json({success: false, message: "An account with that name already exists."});
                 return;
             }
