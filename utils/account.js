@@ -215,3 +215,9 @@ AccountUtils.prototype.getAccountBreadCount = function(account) {
     return account.inventory[BREAD_TILE];
 }
 
+AccountUtils.prototype.setAccountBreadCount = function(account, breadCount) {
+    if (!("inventory" in account)) {
+        account.inventory = {};
+    }
+    account.inventory[BREAD_TILE] = breadCount;
+}

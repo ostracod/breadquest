@@ -116,9 +116,11 @@ router.post("/createAccountAction", function(req, res, next) {
     var tempAvatar = parseInt(req.body.avatar);
     if (tempUsername.length > 30) {
         res.json({success: false, message: "Your username may not be longer than 30 characters."});
+        return;
     }
     if (tempAvatar < 0 || tempAvatar > 7 || isNaN(tempAvatar)) {
         res.json({success: false, message: "Invalid avatar."});
+        return;
     }
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
@@ -229,7 +231,7 @@ router.get("/changeAvatar", checkAuthentication(PAGE_ERROR_OUTPUT), function(req
     function reportInsufficientBread() {
         pageUtils.serveMessagePage(res, "You don't have enough bread to afford that.", "menu", "Return to Main Menu");
     }
-    tempUsername = req.session.username;
+    var tempUsername = req.session.username;
     var tempBreadCount = null;
     var tempPlayer = gameUtils.getPlayerByUsername(tempUsername);
     if (tempPlayer !== null) {
@@ -257,6 +259,77 @@ router.get("/changeAvatar", checkAuthentication(PAGE_ERROR_OUTPUT), function(req
                 avatar: result.avatar,
                 avatarChangeCost: gameUtils.avatarChangeCost,
                 breadCount: tempBreadCount
+            });
+        });
+    });
+});
+
+router.post("/changeAvatarAction", checkAuthentication(JSON_ERROR_OUTPUT), function(req, res, next) {
+    var tempAvatar = parseInt(req.body.avatar);
+    if (tempAvatar < 0 || tempAvatar > 7 || isNaN(tempAvatar)) {
+        res.json({success: false, message: "Invalid avatar."});
+        return;
+    }
+    function reportInsufficientBread() {
+        res.json({
+            success: false,
+            message: "You don't have enough bread to afford that."
+        });
+    }
+    function reportSameAvatar() {
+        res.json({
+            success: false,
+            message: "You are already using that avatar."
+        });
+    }
+    var tempUsername = req.session.username;
+    var tempBreadCount = null;
+    var tempPlayer = gameUtils.getPlayerByUsername(tempUsername);
+    if (tempPlayer !== null) {
+        tempBreadCount = tempPlayer.inventory.getTileCount(BREAD_TILE);
+        if (tempBreadCount < gameUtils.avatarChangeCost) {
+            reportInsufficientBread();
+            return;
+        }
+        if (tempAvatar == tempPlayer.avatar) {
+            reportSameAvatar();
+            return;
+        }
+        tempBreadCount -= gameUtils.avatarChangeCost;
+        tempPlayer.inventory.setTileCount(BREAD_TILE, tempBreadCount);
+        tempPlayer.setAvatar(tempAvatar);
+    }
+    accountUtils.acquireLock(function() {
+        accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
+            if (error) {
+                accountUtils.releaseLock();
+                reportDatabaseErrorWithJson(error, req, res);
+                return;
+            }
+            var tempAccount = result;
+            if (tempBreadCount === null) {
+                tempBreadCount = accountUtils.getAccountBreadCount(tempAccount);
+                if (tempBreadCount < gameUtils.avatarChangeCost) {
+                    accountUtils.releaseLock();
+                    reportInsufficientBread();
+                    return;
+                }
+                if (tempAvatar == tempAccount.avatar) {
+                    accountUtils.releaseLock();
+                    reportSameAvatar();
+                    return;
+                }
+                tempBreadCount -= gameUtils.avatarChangeCost;
+            }
+            accountUtils.setAccountBreadCount(tempAccount, tempBreadCount);
+            tempAccount.avatar = tempAvatar;
+            accountUtils.setAccount(index, tempAccount, function(error) {
+                accountUtils.releaseLock();
+                if (error) {
+                    reportDatabaseErrorWithJson(error, req, res);
+                    return;
+                }
+                res.json({success: true});
             });
         });
     });

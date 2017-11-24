@@ -126,6 +126,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "setStats") {
                 performSetStatsCommand(tempCommand);
             }
+            if (tempCommand.commandName == "setAvatar") {
+                performSetAvatarCommand(tempCommand);
+            }
             index += 1;
         }
         // Repeat unprocessed client-side commands.
@@ -249,6 +252,12 @@ function addGetStatsCommand() {
 function addEatBreadCommand() {
     gameUpdateCommandList.push({
         commandName: "eatBread"
+    });
+}
+
+function addGetAvatarChangesCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getAvatarChanges"
     });
 }
 
@@ -384,6 +393,10 @@ function performSetStatsCommand(command) {
     localPlayerHealth = command.health;
     document.getElementById("hp").innerHTML = localPlayerHealth;
     localPlayer.isInvincible = command.isInvincible;
+}
+
+function performSetAvatarCommand(command) {
+    localPlayer.avatar = command.avatar;
 }
 
 function Entity(id, pos) {
@@ -1181,6 +1194,7 @@ function timerEvent() {
             addGetInventoryChangesCommand();
             addGetRespawnPosChangesCommand();
             addGetStatsCommand();
+            addGetAvatarChangesCommand();
             new GameUpdateRequest();
         }
     }

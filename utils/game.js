@@ -8,7 +8,7 @@ function GameUtils() {
     this.enemySpawnDelay = 0;
     this.enemyToChunkRatio = 10;
     this.isPersistingEverything = false;
-    this.avatarChangeCost = 1;
+    this.avatarChangeCost = 30;
 }
 
 var gameUtils = new GameUtils();
@@ -196,6 +196,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "eatBread") {
                 performEatBreadCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "getAvatarChanges") {
+                performGetAvatarChangesCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -301,6 +304,13 @@ function addSetStatsCommand(player, commandList) {
         commandName: "setStats",
         health: player.health,
         isInvincible: player.isInvincible()
+    });
+}
+
+function addSetAvatarCommand(player, commandList) {
+    commandList.push({
+        commandName: "setAvatar",
+        avatar: player.avatar,
     });
 }
 
@@ -436,6 +446,13 @@ function performGetStatsCommand(command, player, commandList) {
 
 function performEatBreadCommand(command, player, commandList) {
     player.eatBread();
+}
+
+function performGetAvatarChangesCommand(command, player, commandList) {
+    if (player.avatarHasChanged) {
+        addSetAvatarCommand(player, commandList);
+        player.avatarHasChanged = false;
+    }
 }
 
 GameUtils.prototype.persistEverything = function(done) {

@@ -52,6 +52,7 @@ function Player(account) {
     Entity.call(this, tempPos);
     this.username = account.username;
     this.avatar = account.avatar;
+    this.avatarHasChanged = false;
     var tempDate = new Date();
     this.lastActivityTime = tempDate.getTime();
     this.lastChatMessageId = getNextChatMessageId() - 10;
@@ -69,6 +70,11 @@ classUtils.setParentClass(Player, Entity);
 Player.prototype.setRespawnPos = function(pos) {
     this.respawnPos = pos.copy();
     this.respawnPosHasChanged = true;
+}
+
+Player.prototype.setAvatar = function(avatar) {
+    this.avatar = avatar;
+    this.avatarHasChanged = true;
 }
 
 Player.prototype.decrementNextItemCount = function(tileList) {
