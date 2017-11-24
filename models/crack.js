@@ -1,15 +1,7 @@
 
-var classUtils = require("utils/class");
 var Pos = require("models/pos").Pos;
 var Entity = require("models/entity").Entity;
-var accountUtils = require("utils/account");
-var gameUtils = require("utils/game");
-var chunkUtils = require("utils/chunk");
-
-var tempResource = require("models/chunk");
-var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
-var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
-var EMPTY_TILE = tempResource.EMPTY_TILE;
+var classUtils = require("utils/class");
 
 function Crack(pos, username) {
     Entity.call(this, pos);
@@ -18,6 +10,19 @@ function Crack(pos, username) {
     this.expirationTime = tempDate.getTime() + 500;
 }
 classUtils.setParentClass(Crack, Entity);
+
+module.exports = {
+    Crack: Crack
+}
+
+var accountUtils = require("utils/account");
+var gameUtils = require("utils/game");
+var chunkUtils = require("utils/chunk");
+
+var tempResource = require("models/chunk");
+var BLOCK_START_TILE = tempResource.BLOCK_START_TILE;
+var BLOCK_TILE_AMOUNT = tempResource.BLOCK_TILE_AMOUNT;
+var EMPTY_TILE = tempResource.EMPTY_TILE;
 
 Crack.prototype.tick = function() {
     Entity.prototype.tick.call(this);
@@ -47,8 +52,4 @@ Crack.prototype.getClientInfo = function() {
         id: this.id,
         pos: this.pos.toJson()
     }
-}
-
-module.exports = {
-    Crack: Crack
 }

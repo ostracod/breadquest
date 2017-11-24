@@ -43,7 +43,7 @@ var breadTile = 148;
 var ovenTile = 149;
 var hospitalTile = 150;
 var symbolStartTile = 33;
-var symbolTileAmount = 126;
+var symbolTileAmount = 94;
 var entityList = [];
 var localPlayer;
 var entityWalkOffsetList = [
