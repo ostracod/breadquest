@@ -10,6 +10,7 @@ var Entity = tempResource.Entity;
 var entityList = tempResource.entityList;
 var entityWalkOffsetList = tempResource.entityWalkOffsetList;
 
+var Enemy = require("models/enemy").Enemy;
 var Crack = require("models/crack").Crack;
 var Inventory = require("models/inventory").Inventory;
 var getNextChatMessageId = require("models/chatMessage").getNextChatMessageId;
@@ -61,6 +62,7 @@ function Player(account) {
     } else {
         this.health = maximumPlayerHealth;
     }
+    this.invincibilityDelay = 0;
 }
 classUtils.setParentClass(Player, Entity);
 
@@ -69,10 +71,35 @@ Player.prototype.setRespawnPos = function(pos) {
     this.respawnPosHasChanged = true;
 }
 
+Player.prototype.die = function() {
+    // TODO: Drop items.
+    
+    this.pos = this.respawnPos.copy();
+    this.health = maximumPlayerHealth;
+}
+
+Player.prototype.receiveDamage = function(amount) {
+    if (this.invincibilityDelay > 0) {
+        return;
+    }
+    this.health -= amount;
+    if (this.health <= 0) {
+        this.die();
+    }
+    this.invincibilityDelay = 8 * gameUtils.framesPerSecond;
+}
+
 Player.prototype.tick = function() {
     Entity.prototype.tick.call(this);
     if (this.walkBudget < maximumWalkBudget) {
         this.walkBudget += 1;
+    }
+    if (this.invincibilityDelay > 0) {
+        this.invincibilityDelay -= 1;
+    }
+    var tempCount = gameUtils.getEntityCountByClassNearPos(Enemy, this.pos, 0);
+    if (tempCount >= 1) {
+        this.receiveDamage(1);
     }
     var tempDate = new Date();
     var tempTime = tempDate.getTime();
@@ -156,8 +183,7 @@ Player.prototype.interactWithAdjacentTile = function(direction) {
         this.setRespawnPos(this.pos.copy());
     }
     if (tempTile == HOSPITAL_TILE) {
-        // TODO: Heal.
-        
+        this.health = maximumPlayerHealth;
         this.setRespawnPos(this.pos.copy());
     }
 }
