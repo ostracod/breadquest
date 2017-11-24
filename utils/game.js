@@ -8,6 +8,7 @@ function GameUtils() {
     this.enemySpawnDelay = 0;
     this.enemyToChunkRatio = 10;
     this.isPersistingEverything = false;
+    this.avatarChangeCost = 1;
 }
 
 var gameUtils = new GameUtils();

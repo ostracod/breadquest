@@ -25,7 +25,13 @@ function stopServer() {
                 Hello {{username}}!
             </p>
             <p>
+                Bread Count: {{breadCount}}
+            </p>
+            <p>
                 <canvas id="avatarCanvas" width="96" height="96" style="width: 48px; height: 48px;"></canvas>
+            </p>
+            <p>
+                <a href="changeAvatar">Change Avatar (Cost: {{avatarChangeCost}} Bread)</a>
             </p>
             <p>
                 <button onclick="window.open('game', '_blank');">Enter World</button>

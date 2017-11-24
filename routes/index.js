@@ -217,7 +217,46 @@ router.get("/menu", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, n
             res.render("menu.html", {
                 username: tempUsername,
                 isAdmin: isAdmin(tempUsername),
-                avatar: result.avatar
+                avatar: result.avatar,
+                breadCount: accountUtils.getAccountBreadCount(result),
+                avatarChangeCost: gameUtils.avatarChangeCost
+            });
+        });
+    });
+});
+
+router.get("/changeAvatar", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, next) {
+    function reportInsufficientBread() {
+        pageUtils.serveMessagePage(res, "You don't have enough bread to afford that.", "menu", "Return to Main Menu");
+    }
+    tempUsername = req.session.username;
+    var tempBreadCount = null;
+    var tempPlayer = gameUtils.getPlayerByUsername(tempUsername);
+    if (tempPlayer !== null) {
+        tempBreadCount = tempPlayer.inventory.getTileCount(BREAD_TILE);
+        if (tempBreadCount < gameUtils.avatarChangeCost) {
+            reportInsufficientBread();
+            return;
+        }
+    }
+    accountUtils.acquireLock(function() {
+        accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
+            accountUtils.releaseLock();
+            if (error) {
+                reportDatabaseErrorWithPage(error, req, res);
+                return;
+            }
+            if (tempBreadCount === null) {
+                tempBreadCount = accountUtils.getAccountBreadCount(result);
+            }
+            if (tempBreadCount < gameUtils.avatarChangeCost) {
+                reportInsufficientBread();
+                return;
+            }
+            res.render("changeAvatar.html", {
+                avatar: result.avatar,
+                avatarChangeCost: gameUtils.avatarChangeCost,
+                breadCount: tempBreadCount
             });
         });
     });

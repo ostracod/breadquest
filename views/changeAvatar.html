@@ -1,0 +1,137 @@
+<html>
+    <head>
+        <script src="javascript/global.js"></script>
+        <script src="javascript/pos.js"></script>
+        <script src="javascript/sprite.js"></script>
+        <link type="text/css" rel="stylesheet" media="all" href="stylesheets/global.css" />
+        <script>
+
+var avatarAmount = 8;
+var avatarCanvasList = [];
+var avatarCanvasSize = 96;
+var selectedAvatar = null;
+var isChangingAvatar = false;
+
+function selectAvatar(which) {
+    var index = 0;
+    while (index < avatarCanvasList.length) {
+        var tempCanvas = avatarCanvasList[index];
+        if (index == which) {
+            tempCanvas.style.border = "3px #000000 solid";
+        } else {
+            tempCanvas.style.border = "3px #FFFFFF solid";
+        }
+        index += 1;
+    }
+    selectedAvatar = which;
+}
+
+function ChangeAvatarRequest(avatar) {
+    if (isChangingAvatar) {
+        return;
+    }
+    isChangingAvatar = true;
+    document.getElementById("message").innerHTML = "Changing avatar...";
+    AjaxRequest.call(this, "changeAvatarAction", {}, {
+        avatar: avatar
+    });
+}
+setParentClass(ChangeAvatarRequest, AjaxRequest);
+
+ChangeAvatarRequest.prototype.respond = function(data) {
+    isChangingAvatar = false;
+    document.getElementById("message").innerHTML = "";
+    if (data.success) {
+        alert("Your avatar was changed successfully.");
+        window.location = "menu";
+    } else {
+        alert(data.message);
+    }
+    AjaxRequest.prototype.respond.call(this, data);
+}
+
+function processFields() {
+    if (selectedAvatar === null) {
+        alert("Please select an avatar.");
+        return;
+    }
+    new ChangeAvatarRequest(selectedAvatar);
+    return;
+}
+
+        </script>
+    </head>
+    <body>
+        <div id="content">
+            <h2>BREADQUEST</h2>
+            <p>
+                <a href="menu">Return to Menu</a>
+            </p>
+            <h2>CHANGE AVATAR</h2>
+            <form onsubmit="processFields(); return false;">
+                <table cellpadding="5">
+                    <tr>
+                        <td>Old Avatar:</td>
+                        <td><canvas id="currentAvatar" width="96" height="96" style="width: 48px; height: 48px; margin: 11px;"></canvas></td>
+                    </tr>
+                    <tr>
+                        <td>New Avatar:<br/>(Click One)</td>
+                        <td id="avatarList"></td>
+                    </tr>
+                    <tr>
+                        <td>Your Bread Count:</td>
+                        <td><strong>{{breadCount}}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Avatar Change Cost:</td>
+                        <td><strong>{{avatarChangeCost}}</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="submit" /></td>
+                    </tr>
+                </table>
+            </form>
+            <p id="message">
+            
+            </p>
+        </div>
+        <script>
+
+var tempContainer = document.getElementById("avatarList");
+var index = 0;
+while (index < avatarAmount) {
+    var tempCanvas = document.createElement("canvas");
+    tempCanvas.onclick = (function() {
+        var tempIndex = index;
+        return function() {
+            selectAvatar(tempIndex);
+        }
+    })();
+    tempCanvas.width = avatarCanvasSize;
+    tempCanvas.height = avatarCanvasSize;
+    tempCanvas.style.width = avatarCanvasSize / 2;
+    tempCanvas.style.height = avatarCanvasSize / 2;
+    tempCanvas.style.border = "3px #FFFFFF solid";
+    tempCanvas.style.margin = "8px";
+    tempContainer.appendChild(tempCanvas);
+    avatarCanvasList.push(tempCanvas);
+    index += 1;
+}
+
+initializeSpriteSheet(function () {
+    var index = 0;
+    while (index < avatarCanvasList.length) {
+        var tempCanvas = avatarCanvasList[index];
+        var tempContext = tempCanvas.getContext("2d");
+        drawSpriteOnContext(tempContext, new Pos(16, 16), 64, index);
+        index += 1;
+    }
+    var tempCanvas = document.getElementById("currentAvatar");
+    var tempContext = tempCanvas.getContext("2d");
+    drawSpriteOnContext(tempContext, new Pos(16, 16), 64, {{avatar}});
+});
+
+        </script>
+    </body>
+</html>
