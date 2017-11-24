@@ -42,6 +42,8 @@ var powderTile = 147;
 var breadTile = 148;
 var ovenTile = 149;
 var hospitalTile = 150;
+var symbolStartTile = 151;
+var symbolTileAmount = 128;
 var entityList = [];
 var localPlayer;
 var entityWalkOffsetList = [
@@ -62,6 +64,9 @@ var localPlayerHealth = localPlayerMaximumHealth;
 var invincibilityBlinkDelay = 0;
 var textToPlaceInputIsFocused = false;
 var textToPlaceInput;
+var textToPlace = null;
+var textToPlaceIndex;
+var textToPlaceIsWaitingToWalk;
 
 var moduleList = [];
 
@@ -585,21 +590,22 @@ Player.prototype.draw = function() {
 
 Player.prototype.walk = function(direction) {
     if (this.walkDelay > 0) {
-        return;
+        return false;
     }
     if (this == localPlayer) {
         if (localCrack !== null) {
-            return;
+            return false;
         }
     }
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = getTileBufferValue(tempPos);
     if (!this.canWalkThroughTile(tempTile)) {
-        return;
+        return false;
     }
     this.pos.set(tempPos);
     addWalkCommand(direction);
     this.walkDelay = (1 / 8) * framesPerSecond;
+    return true;
 }
 
 Player.prototype.placeTile = function(direction) {
@@ -984,6 +990,9 @@ function drawTileOnContext(context, pos, size, which) {
     if (which == hospitalTile) {
         drawSpriteOnContext(context, pos, size, 17);
     }
+    if (which >= symbolStartTile && which < symbolStartTile + symbolTileAmount) {
+        drawSpriteOnContext(context, pos, size, which - symbolStartTile + 80);
+    }
 }
 
 function drawTile(pos, which) {
@@ -1053,6 +1062,12 @@ function drawCompass() {
     compassContext.fill();
 }
 
+function startPlacingText(text) {
+    textToPlace = text;
+    textToPlaceIndex = 0;
+    textToPlaceIsWaitingToWalk = false;
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -1077,7 +1092,17 @@ function keyDownEvent(event) {
             setAllInputIsFocusedAsFalse();
             canvasIsFocused = true;
         }
+    } else if (textToPlaceInputIsFocused) {
+        if (keyCode == 13) {
+            var tempText = textToPlaceInput.value;
+            startPlacingText(tempText);
+            textToPlaceInput.value = "";
+            textToPlaceInput.blur();
+            setAllInputIsFocusedAsFalse();
+            canvasIsFocused = true;
+        }
     } else if (canvasIsFocused) {
+        textToPlace = null;
         if (keyCode == 13) {
             document.getElementById("overlayChat").style.display = "block";
             overlayChatInput.style.display = "block";
@@ -1207,6 +1232,23 @@ function timerEvent() {
         var tempEntity = entityList[index];
         tempEntity.tick();
         index -= 1;
+    }
+    if (textToPlace !== null) {
+        if (textToPlaceIndex >= textToPlace.length) {
+            textToPlace = null;
+        } else {
+            if (!textToPlaceIsWaitingToWalk) {
+                var tempCharacter = textToPlace.charCodeAt(textToPlaceIndex);
+                // TODO: Place tile.
+                
+                textToPlaceIsWaitingToWalk = true;
+            }
+            var tempResult = localPlayer.walk(1);
+            if (tempResult) {
+                textToPlaceIndex += 1;
+                textToPlaceIsWaitingToWalk = false;
+            }
+        }
     }
     cameraPos.set(localPlayer.pos);
     var tempOffset = Math.floor(canvasSpriteSize / 2);
