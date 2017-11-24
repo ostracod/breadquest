@@ -35,7 +35,7 @@ Enemy.prototype.tick = function() {
     if (this.walkDelay <= 0) {
         this.walkDelay = 0.75 * gameUtils.framesPerSecond;
         var tempResult = this.walk();
-        if (!tempResult) {
+        if (!tempResult && this.targetUsername !== null) {
             this.targetUsername = null;
             this.targetDelay = 10;
         }
