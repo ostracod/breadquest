@@ -39,6 +39,7 @@
                 <div style="background: #444444; padding-right: 8px; padding-bottom: 8px; border-radius: 15px;">
                     <button id="statsButton" class="moduleButton" onclick="showOrHideModuleByName('stats');">Stats</button>
                     <button id="locationButton" class="moduleButton" onclick="showOrHideModuleByName('location');">Location</button>
+                    <button id="textToolButton" class="moduleButton" onclick="showOrHideModuleByName('textTool');">Text Tool</button>
                     <button id="inventoryButton" class="moduleButton" onclick="showOrHideModuleByName('inventory');">Inventory</button>
                     <button id="chatButton" class="moduleButton" onclick="showOrHideModuleByName('chat');">Chat</button>
                     <button id="onlinePlayersButton" class="moduleButton" onclick="showOrHideModuleByName('onlinePlayers');">Players</button>
@@ -91,6 +92,23 @@
                     </div>
                 </div>
                 
+                <div id="textToolModule" class="module">
+                    <p>
+                        <div style="float: left;">
+                            <h2>TEXT TOOL</h2>
+                        </div>
+                        <div style="float: right;">
+                            <button class="closeButton" onclick="showOrHideModuleByName('textTool');">&#xD7;</button>
+                        </div>
+                        <br style="clear: both;" />
+                    </p>
+                    <p>
+                        Enter some text to place in the world:
+                        <br />
+                        <input id="textToPlaceInput" onfocus="setAllInputIsFocusedAsFalse(); textToPlaceInputIsFocused = true;" style="width: 325px;" />
+                    </p>
+                </div>
+                
                 <div id="inventoryModule" class="module">
                     <p>
                         <div style="float: left;">
@@ -136,7 +154,6 @@
                     <div id="onlinePlayersDiv" style="padding: 10px; width: 305px; height: 200px; overflow-y: scroll; border: 1px #888888 solid;">
                     </div>
                 </div>
-                
             </div>
             <br style="clear: both;" />
         </div>

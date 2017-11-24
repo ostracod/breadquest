@@ -60,6 +60,8 @@ var respawnPos = new Pos(0, 0);
 var localPlayerMaximumHealth = 5;
 var localPlayerHealth = localPlayerMaximumHealth;
 var invincibilityBlinkDelay = 0;
+var textToPlaceInputIsFocused = false;
+var textToPlaceInput;
 
 var moduleList = [];
 
@@ -924,6 +926,7 @@ function setAllInputIsFocusedAsFalse() {
     canvasIsFocused = false;
     chatInputIsFocused = false;
     overlayChatInputIsFocused = false;
+    textToPlaceInputIsFocused = false;
 }
 
 function computeCanvasSize() {
@@ -1285,6 +1288,7 @@ function initializeGame() {
     chatOutput = document.getElementById("chatOutput");
     overlayChatInput = document.getElementById("overlayChatInput");
     overlayChatOutput = document.getElementById("overlayChatOutput");
+    textToPlaceInput = document.getElementById("textToPlaceInput");
     
     initializeSpriteSheet(function() {
         addAllInventoryItemsToMode();
@@ -1293,6 +1297,7 @@ function initializeGame() {
     var tempModule = new Module("stats");
     tempModule.show();
     var tempModule = new Module("location");
+    var tempModule = new Module("textTool");
     var tempModule = new Module("inventory");
     tempModule.show();
     var tempModule = new Module("chat");
