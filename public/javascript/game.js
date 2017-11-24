@@ -42,8 +42,8 @@ var powderTile = 147;
 var breadTile = 148;
 var ovenTile = 149;
 var hospitalTile = 150;
-var symbolStartTile = 151;
-var symbolTileAmount = 128;
+var symbolStartTile = 33;
+var symbolTileAmount = 126;
 var entityList = [];
 var localPlayer;
 var entityWalkOffsetList = [
@@ -265,6 +265,13 @@ function addEatBreadCommand() {
 function addGetAvatarChangesCommand() {
     gameUpdateCommandList.push({
         commandName: "getAvatarChanges"
+    });
+}
+
+function addPlaceSymbolTileCommand(tile) {
+    gameUpdateCommandList.push({
+        commandName: "placeSymbolTile",
+        tile: tile,
     });
 }
 
@@ -645,7 +652,8 @@ Player.prototype.placeOrRemoveTile = function(direction) {
     if (tempTile >= blockStartTile && tempTile < blockStartTile + blockTileAmount) {
         this.removeTile(direction);
     }
-    if (tempTile >= flourTile && tempTile <= breadTile) {
+    if ((tempTile >= flourTile && tempTile <= breadTile)
+            || (tempTile >= symbolStartTile && tempTile <= symbolStartTile + symbolTileAmount)) {
         this.collectTile(direction);
     }
     if (tempTile == emptyTile
@@ -991,7 +999,7 @@ function drawTileOnContext(context, pos, size, which) {
         drawSpriteOnContext(context, pos, size, 17);
     }
     if (which >= symbolStartTile && which < symbolStartTile + symbolTileAmount) {
-        drawSpriteOnContext(context, pos, size, which - symbolStartTile + 80);
+        drawSpriteOnContext(context, pos, size, which - (symbolStartTile - 1) + 80);
     }
 }
 
@@ -1148,6 +1156,11 @@ function keyDownEvent(event) {
         if (keyCode == 66) {
             addEatBreadCommand();
         }
+        if (keyCode == 84) {
+            showModuleByName("textTool");
+            textToPlaceInput.focus();
+            return false;
+        }
         if (keyCode >= 37 && keyCode <= 40) {
             return false;
         }
@@ -1239,8 +1252,9 @@ function timerEvent() {
         } else {
             if (!textToPlaceIsWaitingToWalk) {
                 var tempCharacter = textToPlace.charCodeAt(textToPlaceIndex);
-                // TODO: Place tile.
-                
+                if (tempCharacter >= 33 && tempCharacter <= 126) {
+                    addPlaceSymbolTileCommand(tempCharacter - 33 + symbolStartTile);
+                }
                 textToPlaceIsWaitingToWalk = true;
             }
             var tempResult = localPlayer.walk(1);

@@ -21,7 +21,7 @@
                 </div>
                 <h2>BREADQUEST</h2>
                 <p>
-                    Explore. Collect ingredients. Bake bread.
+                    Explore. Collect ingredients. Bake bread. Avoid enemies.
                 </p>
                 <h2>CONTROLS</h2>
                 <ul>
@@ -29,6 +29,7 @@
                     <li>Shift + WASD or Arrow Keys = Place or remove item</li>
                     <li>R/F = Scroll through inventory items</li>
                     <li>B = Eat 1 bread to regain 1 health</li>
+                    <li>T = Place text in world</li>
                     <li>Plus and Minus = Zoom in and out</li>
                 </ul>
                 <p>
@@ -51,7 +52,7 @@
                             <h2>STATS</h2>
                         </div>
                         <div style="float: right;">
-                            <button class="closeButton" onclick="showOrHideModuleByName('stats');">&#xD7;</button>
+                            <button class="closeButton" onclick="hideModuleByName('stats');">&#xD7;</button>
                         </div>
                         <br style="clear: both;" />
                     </p>
@@ -72,7 +73,7 @@
                             <h2>LOCATION</h2>
                         </div>
                         <div style="float: right;">
-                            <button class="closeButton" onclick="showOrHideModuleByName('location');">&#xD7;</button>
+                            <button class="closeButton" onclick="hideModuleByName('location');">&#xD7;</button>
                         </div>
                         <br style="clear: both;" />
                     </p>
@@ -98,7 +99,7 @@
                             <h2>TEXT TOOL</h2>
                         </div>
                         <div style="float: right;">
-                            <button class="closeButton" onclick="showOrHideModuleByName('textTool');">&#xD7;</button>
+                            <button class="closeButton" onclick="hideModuleByName('textTool');">&#xD7;</button>
                         </div>
                         <br style="clear: both;" />
                     </p>
@@ -115,7 +116,7 @@
                             <h2>INVENTORY</h2>
                         </div>
                         <div style="float: right;">
-                            <button class="closeButton" onclick="showOrHideModuleByName('inventory');">&#xD7;</button>
+                            <button class="closeButton" onclick="hideModuleByName('inventory');">&#xD7;</button>
                         </div>
                         <br style="clear: both;" />
                     </p>
@@ -129,7 +130,7 @@
                             <h2>CHAT</h2>
                         </div>
                         <div style="float: right;">
-                            <button class="closeButton" onclick="showOrHideModuleByName('chat');">&#xD7;</button>
+                            <button class="closeButton" onclick="hideModuleByName('chat');">&#xD7;</button>
                         </div>
                         <br style="clear: both;" />
                     </p>
@@ -147,7 +148,7 @@
                             <h2>ONLINE PLAYERS</h2>
                         </div>
                         <div style="float: right;">
-                            <button class="closeButton" onclick="showOrHideModuleByName('onlinePlayers');">&#xD7;</button>
+                            <button class="closeButton" onclick="hideModuleByName('onlinePlayers');">&#xD7;</button>
                         </div>
                         <br style="clear: both;" />
                     </p>

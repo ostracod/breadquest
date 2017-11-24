@@ -73,6 +73,8 @@ var POWDER_TILE = tempResource.POWDER_TILE;
 var BREAD_TILE = tempResource.BREAD_TILE;
 var OVEN_TILE = tempResource.OVEN_TILE;
 var HOSPITAL_TILE = tempResource.HOSPITAL_TILE;
+var SYMBOL_START_TILE = tempResource.SYMBOL_START_TILE;
+var SYMBOL_TILE_AMOUNT = tempResource.SYMBOL_TILE_AMOUNT;
 
 var breadIngredientSet = [FLOUR_TILE, WATER_TILE, POWDER_TILE];
 
@@ -112,8 +114,7 @@ Player.prototype.dropItems = function(tileList) {
             var tempPos = this.pos.copy();
             tempPos.add(tempOffset);
             var tempTile = chunkUtils.getTile(tempPos);
-            if ((tempTile >= TRAIL_START_TILE && tempTile < TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
-                    || tempTile == EMPTY_TILE) {
+            if (this.canPlaceOnTile(tempTile)) {
                 var tempTile = this.decrementNextItemCount(tileList);
                 if (tempTile === null) {
                     tempHasExhaustedItems = true;
@@ -298,11 +299,15 @@ Player.prototype.removeTile = function(direction) {
     new Crack(tempPos, this.username);
 }
 
+Player.prototype.canPlaceOnTile = function(tile) {
+    return ((tile >= TRAIL_START_TILE && tile < TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
+       || tile == EMPTY_TILE);
+}
+
 Player.prototype.placeTile = function(direction, tile) {
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = chunkUtils.getTile(tempPos);
-    if ((tempTile < TRAIL_START_TILE || tempTile >= TRAIL_START_TILE + TRAIL_TILE_AMOUNT)
-            && tempTile != EMPTY_TILE) {
+    if (!this.canPlaceOnTile(tempTile)) {
         return false;
     }
     var tempResult = this.inventory.decrementTileCount(tile);
@@ -313,14 +318,36 @@ Player.prototype.placeTile = function(direction, tile) {
     return true;
 }
 
+Player.prototype.placeSymbolTile = function(tile) {
+    if (tile < SYMBOL_START_TILE || tile >= SYMBOL_START_TILE + SYMBOL_TILE_AMOUNT) {
+        return false;
+    }
+    var tempTile = chunkUtils.getTile(this.pos);
+    if (!this.canPlaceOnTile(tempTile)) {
+        return false;
+    }
+    chunkUtils.setTile(this.pos, tile);
+    return true;
+}
+
 Player.prototype.collectTile = function(direction) {
     var tempPos = this.getPosInWalkDirection(direction);
     var tempTile = chunkUtils.getTile(tempPos);
-    if (tempTile < FLOUR_TILE || tempTile > BREAD_TILE) {
-        return;
+    var tempShouldAddToInventory = false;
+    var tempShouldRemove = false;
+    if (tempTile >= SYMBOL_START_TILE && tempTile < SYMBOL_START_TILE + SYMBOL_TILE_AMOUNT) {
+        tempShouldRemove = true;
     }
-    this.inventory.incrementTileCount(tempTile);
-    chunkUtils.setTile(tempPos, EMPTY_TILE);
+    if (tempTile >= FLOUR_TILE && tempTile <= BREAD_TILE) {
+        tempShouldAddToInventory = true;
+        tempShouldRemove = true;
+    }
+    if (tempShouldAddToInventory) {
+        this.inventory.incrementTileCount(tempTile);
+    }
+    if (tempShouldRemove) {
+        chunkUtils.setTile(tempPos, EMPTY_TILE);
+    }
 }
 
 Player.prototype.eatBread = function() {

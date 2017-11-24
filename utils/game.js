@@ -214,6 +214,9 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "getAvatarChanges") {
                 performGetAvatarChangesCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "placeSymbolTile") {
+                performPlaceSymbolTileCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -468,6 +471,10 @@ function performGetAvatarChangesCommand(command, player, commandList) {
         addSetAvatarCommand(player, commandList);
         player.avatarHasChanged = false;
     }
+}
+
+function performPlaceSymbolTileCommand(command, player, commandList) {
+    player.placeSymbolTile(command.tile);
 }
 
 GameUtils.prototype.persistEverything = function(done) {
