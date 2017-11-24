@@ -59,6 +59,7 @@ var selectedInventoryItemIndex = 0;
 var respawnPos = new Pos(0, 0);
 var localPlayerMaximumHealth = 5;
 var localPlayerHealth = localPlayerMaximumHealth;
+var invincibilityBlinkDelay = 0;
 
 var moduleList = [];
 
@@ -292,13 +293,14 @@ function performAddEntityCommand(command) {
     var tempClassName = tempEntityInfo.className;
     var tempPos = createPosFromJson(tempEntityInfo.pos);
     if (tempClassName == "Player") {
-        new Player(
+        var tempPlayer = new Player(
             tempEntityInfo.id,
             tempPos,
             tempEntityInfo.username,
             tempEntityInfo.avatar,
             tempEntityInfo.breadCount
         );
+        tempPlayer.isInvincible = tempEntityInfo.isInvincible;
     }
     if (tempClassName == "Crack") {
         new Crack(
@@ -375,6 +377,7 @@ function performSetRespawnPosCommand(command) {
 function performSetStatsCommand(command) {
     localPlayerHealth = command.health;
     document.getElementById("hp").innerHTML = localPlayerHealth;
+    localPlayer.isInvincible = command.isInvincible;
 }
 
 function Entity(id, pos) {
@@ -533,6 +536,7 @@ function Player(id, pos, username, avatar, breadCount) {
     this.avatar = avatar;
     this.breadCount = breadCount;
     this.walkDelay = 0;
+    this.isInvincible = false;
 }
 setParentClass(Player, Entity);
 
@@ -547,7 +551,9 @@ Player.prototype.draw = function() {
     }
     Entity.prototype.draw.call(this);
     var tempPos = this.getDisplayPos().copy();
-    drawSprite(tempPos, 0 + this.avatar)
+    if (!(this.isInvincible && invincibilityBlinkDelay < 2)) {
+        drawSprite(tempPos, 0 + this.avatar);
+    }
     if (shouldDrawNameTags) {
         tempPos.scale(spriteRenderSize);
         tempPos.x += spriteRenderSize / 2;
@@ -1148,6 +1154,11 @@ function timerEvent() {
         alert("You have been kicked due to inactivity.");
         hasStopped = true;
         window.location = "menu";
+    }
+    
+    invincibilityBlinkDelay += 1;
+    if (invincibilityBlinkDelay >= 4) {
+         invincibilityBlinkDelay = 0;
     }
     
     if (!isRequestingGameUpdate) {

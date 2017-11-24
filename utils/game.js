@@ -295,7 +295,8 @@ function addSetRespawnPosCommand(player, commandList) {
 function addSetStatsCommand(player, commandList) {
     commandList.push({
         commandName: "setStats",
-        health: player.health
+        health: player.health,
+        isInvincible: player.isInvincible()
     });
 }
 

@@ -78,15 +78,19 @@ Player.prototype.die = function() {
     this.health = maximumPlayerHealth;
 }
 
+Player.prototype.isInvincible = function() {
+    return (this.invincibilityDelay > 0);
+}
+
 Player.prototype.receiveDamage = function(amount) {
-    if (this.invincibilityDelay > 0) {
+    if (this.isInvincible()) {
         return;
     }
     this.health -= amount;
     if (this.health <= 0) {
         this.die();
     }
-    this.invincibilityDelay = 8 * gameUtils.framesPerSecond;
+    this.invincibilityDelay = 6 * gameUtils.framesPerSecond;
 }
 
 Player.prototype.tick = function() {
@@ -146,7 +150,8 @@ Player.prototype.getClientInfo = function() {
         pos: this.pos.toJson(),
         username: this.username,
         avatar: this.avatar,
-        breadCount: this.inventory.getTileCount(BREAD_TILE)
+        breadCount: this.inventory.getTileCount(BREAD_TILE),
+        isInvincible: this.isInvincible()
     }
 }
 
