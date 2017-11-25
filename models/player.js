@@ -42,7 +42,9 @@ function Player(account) {
     var index = 0;
     while (index < tempEnemyList.length) {
         var tempEnemy = tempEnemyList[index];
-        console.log("Removing enemy at " + tempEnemy.pos.toString() + " near spawning player.");
+        if (gameUtils.isInDevelopmentMode) {
+            console.log("Removing enemy at " + tempEnemy.pos.toString() + " near spawning player.");
+        }
         tempEnemy.remove();
         index += 1;
     }

@@ -1,4 +1,6 @@
 
+var app = require("breadQuest");
+
 function GameUtils() {
     this.framesPerSecond = 16;
     this.hasStopped = false;
@@ -9,6 +11,8 @@ function GameUtils() {
     this.enemyToChunkRatio = 10;
     this.isPersistingEverything = false;
     this.avatarChangeCost = 30;
+    var mode = app.get("env");
+    this.isInDevelopmentMode = (mode == "development");
 }
 
 var gameUtils = new GameUtils();
@@ -113,7 +117,9 @@ GameUtils.prototype.spawnEnemies = function() {
     if (tempChunkList.length <= 0) {
         return;
     }
-    console.log("Spawning enemies.");
+    if (this.isInDevelopmentMode) {
+        console.log("Spawning enemies.");
+    }
     var tempEnemyCount = this.getEntityCountByClass(Enemy);
     var tempMaximumEnemyCount = tempChunkList.length * this.enemyToChunkRatio;
     var tempIterationCount = 0;
@@ -482,7 +488,9 @@ GameUtils.prototype.persistEverything = function(done) {
         done();
         return;
     }
-    console.log("Saving world state...");
+    if (this.isInDevelopmentMode) {
+        console.log("Saving world state...");
+    }
     this.isPersistingEverything = true;
     chunkUtils.persistAllChunks();
     var self = this;
@@ -491,7 +499,9 @@ GameUtils.prototype.persistEverything = function(done) {
         while (true) {
             if (index >= entityList.length) {
                 self.isPersistingEverything = false;
-                console.log("Saved world state.");
+                if (self.isInDevelopmentMode) {
+                    console.log("Saved world state.");
+                }
                 done();
                 return;
             }

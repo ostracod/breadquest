@@ -25,6 +25,7 @@ if (mode == "development") {
     console.log("WARNING: APPLICATION RUNNING IN DEVELOPMENT MODE!");
     console.log("CACHING TURNED OFF");
     console.log("ERROR REPORTING TURNED ON");
+    console.log("DEBUG SPAM TURNED ON");
     console.log("SIMULATED LAG TURNED ON");
     console.log("AUTHENTICATION TURNED OFF");
     console.log("HTTPS TURNED OFF");

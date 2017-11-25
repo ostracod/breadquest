@@ -14,7 +14,6 @@ var checkAuthentication = pageUtils.checkAuthentication;
 var serveMessagePage = pageUtils.serveMessagePage;
 var JSON_ERROR_OUTPUT = pageUtils.errorOutput.JSON_ERROR_OUTPUT;
 var PAGE_ERROR_OUTPUT = pageUtils.errorOutput.PAGE_ERROR_OUTPUT;
-var mode = app.get("env");
 
 router.get("/index", function(req, res, next) {
     res.render("index.html", {message: "It works!"});
@@ -364,7 +363,7 @@ router.post("/gameUpdate", checkAuthentication(JSON_ERROR_OUTPUT), function(req,
             res.json(result);
         });
     }
-    if (mode == "development") {
+    if (gameUtils.isInDevelopmentMode) {
         setTimeout(performUpdate, 50 + Math.floor(Math.random() * 150));
     } else {
         performUpdate();
