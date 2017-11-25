@@ -7,7 +7,7 @@ function Crack(pos, username) {
     Entity.call(this, pos);
     this.username = username;
     var tempDate = new Date();
-    this.expirationTime = tempDate.getTime() + 500;
+    this.expirationTime = tempDate.getTime() + 250;
 }
 classUtils.setParentClass(Crack, Entity);
 
