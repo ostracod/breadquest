@@ -57,7 +57,7 @@ module.exports = {
 }
 
 var Pos = require("models/pos").Pos;
-var Player = require("models/enemy").Player;
+var Player = require("models/player").Player;
 var Enemy = require("models/enemy").Enemy;
 var entityList = require("models/entity").entityList;
 var classUtils = require("utils/class");
