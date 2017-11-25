@@ -682,6 +682,7 @@ Crack.prototype.tick = function() {
         var tempDate = new Date();
         if (tempDate.getTime() >= localCrackExpirationTime) {
             this.remove();
+            setTileBufferValue(this.pos, emptyTile);
             localCrack = null;
         }
     }
