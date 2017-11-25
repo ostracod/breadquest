@@ -7,4 +7,4 @@ ssl.crt
 sessionSecret.txt
 accounts.txt
 chunks
-
+serverMessages.txt
