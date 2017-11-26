@@ -209,6 +209,11 @@ router.post("/changePasswordAction", checkAuthentication(JSON_ERROR_OUTPUT), fun
 
 router.get("/menu", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, next) {
     tempUsername = req.session.username;
+    var tempBreadCount = null;
+    var tempPlayer = gameUtils.getPlayerByUsername(tempUsername);
+    if (tempPlayer !== null) {
+        tempBreadCount = tempPlayer.inventory.getTileCount(BREAD_TILE);
+    }
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(tempUsername, function(error, index, result) {
             accountUtils.releaseLock();
@@ -216,11 +221,14 @@ router.get("/menu", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, n
                 reportDatabaseErrorWithPage(error, req, res);
                 return;
             }
+            if (tempBreadCount === null) {
+                tempBreadCount = accountUtils.getAccountBreadCount(result);
+            }
             res.render("menu.html", {
                 username: tempUsername,
                 isAdmin: isAdmin(tempUsername),
                 avatar: result.avatar,
-                breadCount: accountUtils.getAccountBreadCount(result),
+                breadCount: tempBreadCount,
                 avatarChangeCost: gameUtils.avatarChangeCost
             });
         });
