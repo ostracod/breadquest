@@ -148,6 +148,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "collectTile") {
                 performCollectTileCommand(tempCommand);
             }
+            if (tempCommand.commandName == "walk") {
+                performWalkCommand(tempCommand);
+            }
             index += 1;
         }
     } else {
@@ -176,7 +179,9 @@ function addGetTilesCommand() {
 function addWalkCommand(direction) {
     gameUpdateCommandList.push({
         commandName: "walk",
-        direction: direction
+        direction: direction,
+        // Note: pos is ignored by the server. It is for client-use only.
+        pos: localPlayer.getPosInWalkDirection(direction).toJson()
     });
 }
 
@@ -413,6 +418,10 @@ function performSetAvatarCommand(command) {
     localPlayer.avatar = command.avatar;
 }
 
+function performWalkCommand(command) {
+    setTileBufferValue(createPosFromJson(command.pos), trailStartTile + localPlayer.avatar);
+}
+
 function Entity(id, pos) {
     this.id = id;
     this.pos = pos;
@@ -609,8 +618,9 @@ Player.prototype.walk = function(direction) {
     if (!this.canWalkThroughTile(tempTile)) {
         return false;
     }
-    this.pos.set(tempPos);
     addWalkCommand(direction);
+    this.pos.set(tempPos);
+    setTileBufferValue(this.pos, trailStartTile + this.avatar);
     this.walkDelay = (1 / 8) * framesPerSecond;
     return true;
 }
