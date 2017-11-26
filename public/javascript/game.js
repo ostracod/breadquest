@@ -419,7 +419,17 @@ function performSetAvatarCommand(command) {
 }
 
 function performWalkCommand(command) {
-    setTileBufferValue(createPosFromJson(command.pos), trailStartTile + localPlayer.avatar);
+    var tempPos = createPosFromJson(command.pos);
+    placeLocalPlayerTrail(tempPos);
+}
+
+function placeLocalPlayerTrail(pos) {
+    var tempTile = getTileBufferValue(pos);
+    if ((tempTile >= trailStartTile && tempTile < trailStartTile + trailTileAmount)
+            || (tempTile >= flourTile && tempTile <= breadTile)
+            || tempTile == emptyTile) {
+        setTileBufferValue(pos, trailStartTile + localPlayer.avatar);
+    }
 }
 
 function Entity(id, pos) {
@@ -620,7 +630,7 @@ Player.prototype.walk = function(direction) {
     }
     addWalkCommand(direction);
     this.pos.set(tempPos);
-    setTileBufferValue(this.pos, trailStartTile + this.avatar);
+    placeLocalPlayerTrail(this.pos);
     this.walkDelay = (1 / 8) * framesPerSecond;
     return true;
 }
