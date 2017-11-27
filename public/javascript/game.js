@@ -67,6 +67,8 @@ var textToPlaceInput;
 var textToPlace = null;
 var textToPlaceIndex;
 var textToPlaceIsWaitingToWalk;
+var localPlayerWalkRepeatDirection = null;
+var localPlayerWalkRepeatDelay = 0;
 
 var moduleList = [];
 
@@ -685,8 +687,27 @@ Player.prototype.placeOrRemoveTile = function(direction) {
 Player.prototype.performActionInDirection = function(direction) {
     if (shiftKeyIsHeld) {
         this.placeOrRemoveTile(direction);
+        if (this == localPlayer) {
+            localPlayerWalkRepeatDirection = null;
+        }
     } else {
-        this.walk(direction);
+        if (this == localPlayer) {
+            localPlayerStartWalking(direction);
+        } else {
+            this.walk(direction);
+        }
+    }
+}
+
+Player.prototype.stopActionInDirection = function(direction) {
+    if (shiftKeyIsHeld) {
+        // Do nothing.
+    } else {
+        if (this == localPlayer) {
+            localPlayerStopWalking(direction);
+        } else {
+            // Do nothing.
+        }
     }
 }
 
@@ -1097,6 +1118,20 @@ function startPlacingText(text) {
     textToPlaceIsWaitingToWalk = false;
 }
 
+function localPlayerStartWalking(direction) {
+    if (localPlayerWalkRepeatDirection !== direction) {
+        localPlayer.walk(direction);
+        localPlayerWalkRepeatDirection = direction;
+        localPlayerWalkRepeatDelay = 0.35 * framesPerSecond;
+    }
+}
+
+function localPlayerStopWalking(direction) {
+    if (direction == localPlayerWalkRepeatDirection) {
+        localPlayerWalkRepeatDirection = null;
+    }
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -1197,6 +1232,18 @@ function keyUpEvent(event) {
     if (keyCode == 16) {
         shiftKeyIsHeld = false;
     }
+    if (keyCode == 37 || keyCode == 65) {
+        localPlayer.stopActionInDirection(3);
+    }
+    if (keyCode == 39 || keyCode == 68) {
+        localPlayer.stopActionInDirection(1);
+    }
+    if (keyCode == 38 || keyCode == 87) {
+        localPlayer.stopActionInDirection(0);
+    }
+    if (keyCode == 40 || keyCode == 83) {
+        localPlayer.stopActionInDirection(2);
+    }
 }
 
 function timerEvent() {
@@ -1283,6 +1330,13 @@ function timerEvent() {
                 textToPlaceIndex += 1;
                 textToPlaceIsWaitingToWalk = false;
             }
+        }
+    }
+    if (localPlayerWalkRepeatDirection !== null) {
+        if (localPlayerWalkRepeatDelay > 0) {
+            localPlayerWalkRepeatDelay -= 1;
+        } else {
+            localPlayer.walk(localPlayerWalkRepeatDirection);
         }
     }
     cameraPos.set(localPlayer.pos);
