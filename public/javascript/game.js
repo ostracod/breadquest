@@ -69,6 +69,8 @@ var textToPlaceIndex;
 var textToPlaceIsWaitingToWalk;
 var localPlayerWalkRepeatDirection = null;
 var localPlayerWalkRepeatDelay = 0;
+var localPlayerShouldStopWalkRepeat = true;
+var lKeyIsHeld = false;
 
 var moduleList = [];
 
@@ -1123,18 +1125,29 @@ function localPlayerStartWalking(direction) {
         localPlayer.walk(direction);
         localPlayerWalkRepeatDirection = direction;
         localPlayerWalkRepeatDelay = 0.35 * framesPerSecond;
+        localPlayerShouldStopWalkRepeat = !lKeyIsHeld;
     }
 }
 
 function localPlayerStopWalking(direction) {
     if (direction == localPlayerWalkRepeatDirection) {
-        localPlayerWalkRepeatDirection = null;
+        if (localPlayerShouldStopWalkRepeat) {
+            localPlayerWalkRepeatDirection = null;
+        } else {
+            localPlayerShouldStopWalkRepeat = true;
+        }
     }
 }
 
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
+    if (keyCode == 16) {
+        shiftKeyIsHeld = true;
+    }
+    if (keyCode == 76) {
+        lKeyIsHeld = true;
+    }
     if (chatInputIsFocused) {
         if (keyCode == 13) {
             var tempText = chatInput.value;
@@ -1221,9 +1234,6 @@ function keyDownEvent(event) {
             return false;
         }
     }
-    if (keyCode == 16) {
-        shiftKeyIsHeld = true;
-    }
 }
 
 function keyUpEvent(event) {
@@ -1231,6 +1241,9 @@ function keyUpEvent(event) {
     var keyCode = event.which;
     if (keyCode == 16) {
         shiftKeyIsHeld = false;
+    }
+    if (keyCode == 76) {
+        lKeyIsHeld = false;
     }
     if (keyCode == 37 || keyCode == 65) {
         localPlayer.stopActionInDirection(3);
