@@ -246,7 +246,7 @@ Chunk.prototype.generateAllTiles = function() {
             tempOffset.y += 1;
         }
     }
-    if ((this.pos.x == 0 && this.pos.y == 0) || Math.random() < 1 / (15 * 15)) {
+    if ((this.pos.x == 0 && this.pos.y == 0) || Math.random() < 1 / (10 * 10)) {
         this.addRestZone();
     }
     chunkUtils.persistAllChunks();
