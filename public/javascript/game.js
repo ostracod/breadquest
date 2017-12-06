@@ -840,9 +840,9 @@ colorSet = [
     // Trail colors.
     new Color(255, 128, 128),
     new Color(255, 192, 64),
-    new Color(255, 255, 128),
+    new Color(224, 224, 64),
     new Color(64, 255, 64),
-    new Color(64, 255, 255),
+    new Color(64, 224, 224),
     new Color(128, 128, 255),
     new Color(255, 64, 255),
     new Color(192, 192, 192)
