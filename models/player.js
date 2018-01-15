@@ -37,6 +37,16 @@ function Player(account) {
     } else {
         this.health = maximumPlayerHealth;
     }
+    if ("guidelinePos" in account) {
+        var tempData = account.guidelinePos;
+        if (tempData === null) {
+            this.guidelinePos = tempData;
+        } else {
+            this.guidelinePos = createPosFromJson(tempData);
+        }
+    } else {
+        this.guidelinePos = null;
+    }
     this.invincibilityDelay = 0;
     var tempEnemyList = gameUtils.getEntitiesByClassNearPos(Enemy, this.pos, 10);
     var index = 0;
@@ -196,6 +206,11 @@ Player.prototype.persist = function(done) {
             account.respawnPos = self.respawnPos.toJson();
             account.pos = self.pos.toJson();
             account.health = self.health;
+            if (self.guidelinePos === null) {
+                account.guidelinePos = self.guidelinePos;
+            } else {
+                account.guidelinePos = self.guidelinePos.toJson();
+            }
             accountUtils.setAccount(index, account, function(error) {
                 accountUtils.releaseLock();
                 if (error) {

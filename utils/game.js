@@ -223,6 +223,12 @@ GameUtils.prototype.performUpdate = function(username, commandList, done) {
             if (tempCommand.commandName == "placeSymbolTile") {
                 performPlaceSymbolTileCommand(tempCommand, tempPlayer, tempCommandList);
             }
+            if (tempCommand.commandName == "setGuidelinePos") {
+                performSetGuidelinePosCommand(tempCommand, tempPlayer, tempCommandList);
+            }
+            if (tempCommand.commandName == "getGuidelinePos") {
+                performGetGuidelinePosCommand(tempCommand, tempPlayer, tempCommandList);
+            }
         }
     }
     tempPlayer = gameUtils.getPlayerByUsername(username);
@@ -335,6 +341,19 @@ function addSetAvatarCommand(player, commandList) {
     commandList.push({
         commandName: "setAvatar",
         avatar: player.avatar,
+    });
+}
+
+function addSetGuidelinePosCommand(player, commandList) {
+    var tempValue;
+    if (player.guidelinePos === null) {
+        tempValue = player.guidelinePos;
+    } else {
+        tempValue = player.guidelinePos.toJson();
+    }
+    commandList.push({
+        commandName: "setGuidelinePos",
+        pos: tempValue
     });
 }
 
@@ -481,6 +500,18 @@ function performGetAvatarChangesCommand(command, player, commandList) {
 
 function performPlaceSymbolTileCommand(command, player, commandList) {
     player.placeSymbolTile(command.tile);
+}
+
+function performSetGuidelinePosCommand(command, player, commandList) {
+    if (command.pos === null) {
+        player.guidelinePos = command.pos;
+    } else {
+        player.guidelinePos = createPosFromJson(command.pos);
+    }
+}
+
+function performGetGuidelinePosCommand(command, player, commandList) {
+    addSetGuidelinePosCommand(player, commandList);
 }
 
 GameUtils.prototype.persistEverything = function(done) {

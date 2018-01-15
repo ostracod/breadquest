@@ -143,6 +143,9 @@ GameUpdateRequest.prototype.respond = function(data) {
             if (tempCommand.commandName == "setAvatar") {
                 performSetAvatarCommand(tempCommand);
             }
+            if (tempCommand.commandName == "setGuidelinePos") {
+                performSetGuidelinePosCommand(tempCommand);
+            }
             index += 1;
         }
         // Repeat unprocessed client-side commands.
@@ -287,6 +290,25 @@ function addPlaceSymbolTileCommand(tile) {
     });
 }
 
+function addSetGuidelinePosCommand() {
+    var tempValue;
+    if (guidelinePos === null) {
+        tempValue = guidelinePos;
+    } else {
+        tempValue = guidelinePos.toJson();
+    }
+    gameUpdateCommandList.push({
+        commandName: "setGuidelinePos",
+        pos: tempValue,
+    });
+}
+
+function addGetGuidelinePosCommand() {
+    gameUpdateCommandList.push({
+        commandName: "getGuidelinePos"
+    });
+}
+
 function performSetLocalPlayerInfoCommand(command) {
     localPlayer.username = command.username;
     localPlayer.avatar = command.avatar;
@@ -428,6 +450,15 @@ function performSetAvatarCommand(command) {
 function performWalkCommand(command) {
     var tempPos = createPosFromJson(command.pos);
     placeLocalPlayerTrail(tempPos);
+}
+
+function performSetGuidelinePosCommand(command) {
+    if (command.pos === null) {
+        guidelinePos = command.pos;
+    } else {
+        guidelinePos = createPosFromJson(command.pos);
+    }
+    displayGuidelinePos();
 }
 
 function placeLocalPlayerTrail(pos) {
@@ -1161,6 +1192,7 @@ function displayGuidelinePos() {
 function clearGuidelinePos() {
     guidelinePos = null;
     displayGuidelinePos();
+    addSetGuidelinePosCommand();
 }
 
 function setGuidelinePosFromInput() {
@@ -1181,6 +1213,7 @@ function setGuidelinePosFromInput() {
     guidelinePosInput.blur();
     setAllInputIsFocusedAsFalse();
     canvasIsFocused = true;
+    addSetGuidelinePosCommand();
 }
 
 function displayGuideline() {
@@ -1594,6 +1627,7 @@ function initializeGame() {
     
     localPlayer = new Player(-1, new Pos(0, 0), null, null, null);
     addStartPlayingCommand();
+    addGetGuidelinePosCommand();
     
     setInterval(timerEvent, Math.floor(1000 / framesPerSecond));
     setInterval(barTimerEvent, Math.floor(1000 / 30));
