@@ -71,6 +71,9 @@ var localPlayerWalkRepeatDirection = null;
 var localPlayerWalkRepeatDelay = 0;
 var localPlayerShouldStopWalkRepeat = true;
 var lKeyIsHeld = false;
+var guidelinePos = null;
+var guidelinePosInput;
+var guidelinePosInputIsFocused = false;
 
 var moduleList = [];
 
@@ -985,6 +988,7 @@ function setAllInputIsFocusedAsFalse() {
     chatInputIsFocused = false;
     overlayChatInputIsFocused = false;
     textToPlaceInputIsFocused = false;
+    guidelinePosInputIsFocused = false;
 }
 
 function computeCanvasSize() {
@@ -1146,6 +1150,126 @@ function localPlayerStopWalking(direction) {
     }
 }
 
+function displayGuidelinePos() {
+    if (guidelinePos === null) {
+        guidelinePosInput.value = "None";
+    } else {
+        guidelinePosInput.value = guidelinePos.x + ", " + guidelinePos.y;
+    }
+}
+
+function clearGuidelinePos() {
+    guidelinePos = null;
+    displayGuidelinePos();
+}
+
+function setGuidelinePosFromInput() {
+    var tempText = guidelinePosInput.value;
+    var tempList = tempText.split(",");
+    if (tempList.length != 2) {
+        alert("Malformed guideline location.");
+        return;
+    }
+    var tempPosX = parseInt(tempList[0].trim());
+    var tempPosY = parseInt(tempList[1].trim());
+    if (isNaN(tempPosX) || isNaN(tempPosY)) {
+        alert("Malformed guideline location.");
+        return;
+    }
+    guidelinePos = new Pos(tempPosX, tempPosY);
+    displayGuidelinePos();
+    guidelinePosInput.blur();
+    setAllInputIsFocusedAsFalse();
+    canvasIsFocused = true;
+}
+
+function displayGuideline() {
+    if (guidelinePos === null) {
+        return;
+    }
+    var tempPos = guidelinePos.copy();
+    tempPos.subtract(cameraPos);
+    if (tempPos.x < 0) {
+        tempPos.x = 0;
+    }
+    if (tempPos.x >= canvasSpriteSize) {
+        tempPos.x = canvasSpriteSize - 1;
+    }
+    if (tempPos.y < 0) {
+        tempPos.y = 0;
+    }
+    if (tempPos.y >= canvasSpriteSize) {
+        tempPos.y = canvasSpriteSize - 1;
+    }
+    tempPos.scale(spriteRenderSize);
+    var tempPixelSize = spriteRenderSize / 8;
+    tempPos.x += tempPixelSize * 4;
+    tempPos.y += tempPixelSize * 4;
+    context.fillStyle = "rgba(0, 0, 0, 0.4)";
+    context.fillRect(tempPos.x - tempPixelSize, 0, tempPixelSize * 2, canvasSize);
+    context.fillRect(0, tempPos.y - tempPixelSize, canvasSize, tempPixelSize * 2);
+    context.font = "bold 30px Arial";
+    context.textBaseline = "middle";
+    var tempTextPosX;
+    var tempTextPosY;
+    var tempAlignment;
+    if (tempPos.x > canvasSize / 2) {
+        tempTextPosX = tempPos.x - 20;
+        context.textAlign = "right";
+        tempAlignment = 1;
+    } else {
+        tempTextPosX = tempPos.x + 20;
+        context.textAlign = "left";
+        tempAlignment = -1;
+    }
+    if (tempPos.y > canvasSize / 2) {
+        tempTextPosY = 30;
+    } else {
+        tempTextPosY = canvasSize - 30;
+    }
+    var tempText = Math.abs(localPlayer.pos.x - guidelinePos.x);
+    var tempWidth = context.measureText(tempText).width;
+    var tempBackgroundPosX;
+    if (tempAlignment > 0) {
+        tempBackgroundPosX = tempTextPosX - tempWidth;
+    } else {
+        tempBackgroundPosX = tempTextPosX;
+    }
+    context.fillStyle = "rgba(255, 255, 255, 0.6)";
+    context.fillRect(tempBackgroundPosX - 4, tempTextPosY - 19, tempWidth + 8, 38);
+    context.fillStyle = "#000000";
+    context.fillText(tempText, tempTextPosX, tempTextPosY);
+    var tempTextPosX;
+    var tempTextPosY;
+    var tempAlignment;
+    if (tempPos.x > canvasSize / 2) {
+        tempTextPosX = 15;
+        context.textAlign = "left";
+        tempAlignment = -1;
+    } else {
+        tempTextPosX = canvasSize - 15;
+        context.textAlign = "right";
+        tempAlignment = 1;
+    }
+    if (tempPos.y > canvasSize / 2) {
+        tempTextPosY = tempPos.y - 35;
+    } else {
+        tempTextPosY = tempPos.y + 35;
+    }
+    var tempText = Math.abs(localPlayer.pos.y - guidelinePos.y);
+    var tempWidth = context.measureText(tempText).width;
+    var tempBackgroundPosX;
+    if (tempAlignment > 0) {
+        tempBackgroundPosX = tempTextPosX - tempWidth;
+    } else {
+        tempBackgroundPosX = tempTextPosX;
+    }
+    context.fillStyle = "rgba(255, 255, 255, 0.6)";
+    context.fillRect(tempBackgroundPosX - 4, tempTextPosY - 19, tempWidth + 8, 38);
+    context.fillStyle = "#000000";
+    context.fillText(tempText, tempTextPosX, tempTextPosY);
+}
+
 function keyDownEvent(event) {
     lastActivityTime = 0;
     var keyCode = event.which;
@@ -1184,6 +1308,10 @@ function keyDownEvent(event) {
             textToPlaceInput.blur();
             setAllInputIsFocusedAsFalse();
             canvasIsFocused = true;
+        }
+    } else if (guidelinePosInputIsFocused) {
+        if (keyCode == 13) {
+            setGuidelinePosFromInput();
         }
     } else if (canvasIsFocused) {
         textToPlace = null;
@@ -1384,6 +1512,7 @@ function timerEvent() {
         tempEntity.draw();
         index += 1;
     }
+    displayGuideline();
     
     document.getElementById("coordinates").innerHTML = localPlayer.pos.toString();
     var tempOffset = localPlayer.pos.copy();
@@ -1443,6 +1572,7 @@ function initializeGame() {
     overlayChatInput = document.getElementById("overlayChatInput");
     overlayChatOutput = document.getElementById("overlayChatOutput");
     textToPlaceInput = document.getElementById("textToPlaceInput");
+    guidelinePosInput = document.getElementById("guidelinePosInput");
     
     initializeSpriteSheet(function() {
         addAllInventoryItemsToMode();

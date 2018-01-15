@@ -96,6 +96,11 @@
                         <br />
                         <canvas id="compassCanvas" width="200" height="200" style="width: 100px; height: 100px;"></id>
                     </div>
+                    <div style="margin-bottom: 5px;">
+                        Guideline Location "x, y":
+                        <br />
+                        <input id="guidelinePosInput" onfocus="setAllInputIsFocusedAsFalse(); guidelinePosInputIsFocused = true;" style="width: 200px;" autocomplete="off" /> <button onclick="setGuidelinePosFromInput();">Set</button> <button onclick="clearGuidelinePos();">Clear</button>
+                    </div>
                 </div>
                 
                 <div id="textToolModule" class="module">
