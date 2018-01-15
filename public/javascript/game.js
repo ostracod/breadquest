@@ -1080,13 +1080,20 @@ function centerSelectedInventoryItem() {
 function drawCompass() {
     var tempDistance = localPlayer.pos.getDistance(respawnPos);
     var tempOffset;
+    var tempAngle;
     if (tempDistance > 0) {
         tempOffset = respawnPos.copy();
         tempOffset.subtract(localPlayer.pos);
+        tempAngle = Math.atan2(tempOffset.x, -tempOffset.y);
+        if (tempAngle < 0) {
+            tempAngle += 2 * Math.PI;
+        }
         tempOffset.scale(1 / tempDistance);
     } else {
         tempOffset = null;
+        tempAngle = 0;
     }
+    document.getElementById("respawnAngle").innerHTML = Math.round(tempAngle / (Math.PI * 2) * 360);
     compassContext.fillStyle = "#FFFFFF";
     compassContext.fillRect(0, 0, 200, 200);
     compassContext.fillStyle = "#888888";
@@ -1379,6 +1386,9 @@ function timerEvent() {
     }
     
     document.getElementById("coordinates").innerHTML = localPlayer.pos.toString();
+    var tempOffset = localPlayer.pos.copy();
+    tempOffset.subtract(respawnPos);
+    document.getElementById("respawnOffset").innerHTML = tempOffset.toString();
     var tempDistance = Math.round(localPlayer.pos.getDistance(respawnPos));
     document.getElementById("respawnPosDistance").innerHTML = tempDistance;
     
