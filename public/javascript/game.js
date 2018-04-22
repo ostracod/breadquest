@@ -74,7 +74,8 @@ var lKeyIsHeld = false;
 var guidelinePos = null;
 var guidelinePosInput;
 var guidelinePosInputIsFocused = false;
-
+var gameUpdateSocket;
+var gameUpdateStartTimestamp;
 var moduleList = [];
 
 // Thanks to CatTail for this snippet of code.
@@ -94,14 +95,16 @@ function betterModulus(number1, number2) {
     }
 }
 
-function GameUpdateRequest() {
+function performGameUpdateRequest() {
     isRequestingGameUpdate = true;
-    AjaxRequest.call(this, "gameUpdate", {}, {commandList: JSON.stringify(gameUpdateCommandList)});
+    gameUpdateStartTimestamp = Date.now() / 1000;
+    gameUpdateSocket.send(JSON.stringify(gameUpdateCommandList));
     gameUpdateCommandList = [];
 }
-setParentClass(GameUpdateRequest, AjaxRequest);
 
-GameUpdateRequest.prototype.respond = function(data) {
+function handleGameUpdateRequest(data) {
+    var tempTimestamp = Date.now() / 1000;
+    document.getElementById("pingTime").innerHTML = Math.floor((tempTimestamp - gameUpdateStartTimestamp) * 1000);
     if (data.success) {
         var tempCommandList = data.commandList;
         var index = 0;
@@ -168,9 +171,8 @@ GameUpdateRequest.prototype.respond = function(data) {
         hasStopped = true;
         window.location = "menu";
     }
-    gameUpdateRequestDelay = 0.25 * framesPerSecond;
+    gameUpdateRequestDelay = 0.1 * framesPerSecond;
     isRequestingGameUpdate = false;
-    AjaxRequest.prototype.respond.call(this, data);
 }
 
 function addStartPlayingCommand() {
@@ -1485,7 +1487,7 @@ function timerEvent() {
             addGetRespawnPosChangesCommand();
             addGetStatsCommand();
             addGetAvatarChangesCommand();
-            new GameUpdateRequest();
+            performGameUpdateRequest();
         }
     }
     
@@ -1629,6 +1631,21 @@ function initializeGame() {
     addStartPlayingCommand();
     addGetGuidelinePosCommand();
     
-    setInterval(timerEvent, Math.floor(1000 / framesPerSecond));
-    setInterval(barTimerEvent, Math.floor(1000 / 30));
+    var tempProtocol;
+    if (window.location.protocol == "http:") {
+        tempProtocol = "ws:";
+    } else {
+        tempProtocol = "wss:";
+    }
+    var tempAddress = tempProtocol + "//" + window.location.hostname + ":" + window.location.port + "/gameUpdate";
+    gameUpdateSocket = new WebSocket(tempAddress);
+    gameUpdateSocket.onopen = function(event) {
+        setInterval(timerEvent, Math.floor(1000 / framesPerSecond));
+        setInterval(barTimerEvent, Math.floor(1000 / 30));
+    };
+    gameUpdateSocket.onmessage = function(event) {
+        handleGameUpdateRequest(JSON.parse(event.data));
+    };
 }
+
+

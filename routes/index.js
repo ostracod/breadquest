@@ -14,6 +14,7 @@ var checkAuthentication = pageUtils.checkAuthentication;
 var serveMessagePage = pageUtils.serveMessagePage;
 var JSON_ERROR_OUTPUT = pageUtils.errorOutput.JSON_ERROR_OUTPUT;
 var PAGE_ERROR_OUTPUT = pageUtils.errorOutput.PAGE_ERROR_OUTPUT;
+var SOCKET_ERROR_OUTPUT = pageUtils.errorOutput.SOCKET_ERROR_OUTPUT;
 
 router.get("/index", function(req, res, next) {
     res.render("index.html", {message: "It works!"});
@@ -365,16 +366,22 @@ router.get("/game", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, n
     res.render("game.html", {});
 });
 
-router.post("/gameUpdate", checkAuthentication(JSON_ERROR_OUTPUT), function(req, res, next) {
-    function performUpdate() {
-        gameUtils.performUpdate(req.session.username, JSON.parse(req.body.commandList), function(result) {
-            res.json(result);
+router.ws("/gameUpdate", checkAuthentication(SOCKET_ERROR_OUTPUT), function(ws, req, next) {
+    console.log("Opening socket.");
+    ws.on("message", function(message) {
+        var tempCommandList = JSON.parse(message);
+        if (gameUtils.isInDevelopmentMode) {
+            setTimeout(function() {
+                performUpdate(tempCommandList);
+            }, 50 + Math.floor(Math.random() * 150));
+        } else {
+            performUpdate(tempCommandList);
+        }
+    });
+    function performUpdate(commandList) {
+        gameUtils.performUpdate(req.session.username, commandList, function(result) {
+            ws.send(JSON.stringify(result));
         });
-    }
-    if (gameUtils.isInDevelopmentMode) {
-        setTimeout(performUpdate, 50 + Math.floor(Math.random() * 150));
-    } else {
-        performUpdate();
     }
 });
 

@@ -10,16 +10,9 @@ var session = require("express-session")
 var http = require("http");
 var https = require("https");
 var fs = require("fs");
+var expressWs = require("express-ws");
 
 var app = express();
-module.exports = app;
-
-var index = require("./routes/index");
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
-
 var mode = app.get("env");
 if (mode == "development") {
     console.log("WARNING: APPLICATION RUNNING IN DEVELOPMENT MODE!");
@@ -38,6 +31,25 @@ if (mode == "development") {
     console.log("PLEASE USE \"development\" OR \"production\"");
     process.exit(1);
 }
+
+var server;
+if (mode == "development") {
+    server = http.createServer(app);
+} else {
+    var privateKey  = fs.readFileSync("ssl.key", "utf8");
+    var certificate = fs.readFileSync("ssl.crt", "utf8");
+    var credentials = {key: privateKey, cert: certificate};
+    server = https.createServer(credentials, app);
+}
+expressWs(app, server);
+
+module.exports = app;
+
+var index = require("./routes/index");
+
+// view engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "jade");
 
 app.engine("html", mustacheExpress());
 
@@ -76,17 +88,6 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render("error");
 });
-
-var server;
-
-if (mode == "development") {
-    server = http.createServer(app);
-} else {
-    var privateKey  = fs.readFileSync("ssl.key", "utf8");
-    var certificate = fs.readFileSync("ssl.crt", "utf8");
-    var credentials = {key: privateKey, cert: certificate};
-    server = https.createServer(credentials, app);
-}
 
 var portNumber = 2626;
 
