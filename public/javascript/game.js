@@ -171,7 +171,8 @@ function handleGameUpdateRequest(data) {
         hasStopped = true;
         window.location = "menu";
     }
-    gameUpdateRequestDelay = 0.1 * framesPerSecond;
+    //gameUpdateRequestDelay = 0.25 * framesPerSecond;
+    gameUpdateRequestDelay = 0;
     isRequestingGameUpdate = false;
 }
 
