@@ -433,7 +433,17 @@ function performSetInventoryCommand(command) {
         index += 1;
     }
     localPlayer.breadCount = getInventoryItemByTile(breadTile).count;
+    var tempFlourCount = getInventoryItemByTile(flourTile).count;
+    var tempWaterCount = getInventoryItemByTile(waterTile).count;
+    var tempPowderCount = getInventoryItemByTile(powderTile).count;
+    var tempUnbakedBreadCount = Math.min(tempFlourCount, tempWaterCount, tempPowderCount);
+    var tempEffectiveBreadCount = localPlayer.breadCount + tempUnbakedBreadCount;
     document.getElementById("breadCount").innerHTML = localPlayer.breadCount;
+    document.getElementById("flourCount").innerHTML = tempFlourCount;
+    document.getElementById("waterCount").innerHTML = tempWaterCount;
+    document.getElementById("powderCount").innerHTML = tempPowderCount;
+    document.getElementById("unbakedBreadCount").innerHTML = tempUnbakedBreadCount;
+    document.getElementById("effectiveBreadCount").innerHTML = tempEffectiveBreadCount;
 }
 
 function performPlaceTileCommand(command) {
