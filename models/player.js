@@ -10,6 +10,10 @@ var Entity = tempResource.Entity;
 var entityList = tempResource.entityList;
 var entityWalkOffsetList = tempResource.entityWalkOffsetList;
 
+var tempResource = require("models/chatMessage");
+var announceMessageInChat = tempResource.announceMessageInChat;
+var getNextChatMessageId = tempResource.getNextChatMessageId;
+
 function Player(account) {
     if ("respawnPos" in account) {
         this.respawnPos = createPosFromJson(account.respawnPos);
@@ -58,6 +62,7 @@ function Player(account) {
         tempEnemy.remove();
         index += 1;
     }
+    announceMessageInChat(this.username + " has joined the game.");
 }
 classUtils.setParentClass(Player, Entity);
 
@@ -68,7 +73,6 @@ module.exports = {
 var Enemy = require("models/enemy").Enemy;
 var Crack = require("models/crack").Crack;
 var Inventory = require("models/inventory").Inventory;
-var getNextChatMessageId = require("models/chatMessage").getNextChatMessageId;
 var accountUtils = require("utils/account");
 var gameUtils = require("utils/game");
 var chunkUtils = require("utils/chunk");
@@ -151,6 +155,7 @@ Player.prototype.die = function() {
     this.dropItems([FLOUR_TILE, WATER_TILE, POWDER_TILE]);
     this.pos = this.respawnPos.copy();
     this.health = maximumPlayerHealth;
+    announceMessageInChat(this.username + " has died.");
 }
 
 Player.prototype.isInvincible = function() {
@@ -183,6 +188,7 @@ Player.prototype.tick = function() {
     var tempDate = new Date();
     var tempTime = tempDate.getTime();
     if (tempTime > this.lastActivityTime + 10 * 1000) {
+        announceMessageInChat(this.username + " has left the game.");
         this.remove();
         return;
     }

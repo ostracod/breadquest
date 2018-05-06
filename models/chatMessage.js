@@ -19,9 +19,14 @@ function getNextChatMessageId() {
     return nextChatMessageId;
 }
 
+function announceMessageInChat(message) {
+    new ChatMessage(null, message);
+}
+
 module.exports = {
     ChatMessage: ChatMessage,
     chatMessageList: chatMessageList,
-    getNextChatMessageId: getNextChatMessageId
+    getNextChatMessageId: getNextChatMessageId,
+    announceMessageInChat: announceMessageInChat
 }
 

@@ -383,11 +383,20 @@ function performAddEntityCommand(command) {
 }
 
 function performAddChatMessageCommand(command) {
-    var tempPlayerName = encodeHtmlEntity(command.username);
+    var tempPlayerName;
+    if (command.username === null) {
+        tempPlayerName = null;
+    } else {
+        tempPlayerName = encodeHtmlEntity(command.username);
+    }
     var tempText = encodeHtmlEntity(command.text);
     var tempIsAtBottom = (chatOutput.scrollTop + 150 > chatOutput.scrollHeight - 30);
     var tempTag = document.createElement("div");
-    tempTag.innerHTML = "<strong>" + tempPlayerName + ":</strong> " + tempText;
+    if (tempPlayerName === null) {
+        tempTag.innerHTML = tempText;
+    } else {
+        tempTag.innerHTML = "<strong>" + tempPlayerName + ":</strong> " + tempText;
+    }
     chatOutput.appendChild(tempTag);
     chatMessageTagList.push(tempTag);
     while (chatMessageTagList.length > maximumChatMessageCount) {
@@ -887,7 +896,11 @@ colorSet = [
 
 function OverlayChatMessage(playerName, text) {
     this.tag = document.createElement("div");
-    this.tag.innerHTML = "<strong>" + playerName + ":</strong> " + text;
+    if (playerName === null) {
+        this.tag.innerHTML = text;
+    } else {
+        this.tag.innerHTML = "<strong>" + playerName + ":</strong> " + text;
+    }
     overlayChatOutput.appendChild(this.tag);
     this.delay = 8 * framesPerSecond;
     overlayChatMessageList.push(this);
