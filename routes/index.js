@@ -380,7 +380,22 @@ router.ws("/gameUpdate", checkAuthentication(SOCKET_ERROR_OUTPUT), function(ws, 
     });
     function performUpdate(commandList) {
         gameUtils.performUpdate(req.session.username, commandList, function(result) {
-            ws.send(JSON.stringify(result));
+            var tempRetryCount = 0;
+            function tryToSendResponse() {
+                try {
+                    ws.send(JSON.stringify(result));
+                } catch (error) {
+                    console.log(error);
+                    if (tempRetryCount < 3) {
+                        console.log("Trying to send response again.");
+                        setTimeout(tryToSendResponse, 100);
+                        tempRetryCount += 1;
+                    } else {
+                        console.log("Exceeded maximum number of retries.");
+                    }
+                }
+            }
+            tryToSendResponse();
         });
     }
 });
