@@ -6,13 +6,13 @@
     "start": "node breadQuest.js"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^2.0.1",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",
-    "express": "~4.15.2",
+    "express": "^4.15.5",
     "express-session": "^1.15.2",
-    "express-ws": "^3.0.0",
+    "express-ws": "^4.0.0",
     "jade": "~1.11.0",
     "morgan": "~1.8.1",
     "mustache-express": "^1.2.4",
