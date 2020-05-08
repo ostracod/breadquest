@@ -369,8 +369,9 @@ router.get("/game", checkAuthentication(PAGE_ERROR_OUTPUT), function(req, res, n
 router.ws("/gameUpdate", checkAuthentication(SOCKET_ERROR_OUTPUT), function(ws, req, next) {
     console.log("Opening socket.");
     ws.on("message", function(message) {
+        var tempCommandList;
         try {
-            var tempCommandList = JSON.parse(message);
+            tempCommandList = JSON.parse(message);
         } catch (tempErr) {
             var tempResult = {
                 success: false,
