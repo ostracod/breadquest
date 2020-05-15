@@ -35,7 +35,7 @@ Crack.prototype.tick = function() {
 
 Crack.prototype.giveTileToPlayer = function() {
     var tempTile = chunkUtils.getTile(this.pos);
-    if (tempTile < BLOCK_START_TILE && tempTile >= BLOCK_START_TILE + BLOCK_TILE_AMOUNT) {
+    if (tempTile < BLOCK_START_TILE || tempTile >= BLOCK_START_TILE + BLOCK_TILE_AMOUNT) {
         return;
     }
     var tempPlayer = gameUtils.getPlayerByUsername(this.username);

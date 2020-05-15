@@ -404,7 +404,7 @@ function performGetEntitiesCommand(command, player, commandList) {
         while (true) {
             var tempRadius = 40;
             if (tempEntity.pos.x < player.pos.x - tempRadius || tempEntity.pos.x > player.pos.x + tempRadius
-                    || tempEntity.pos.y < player.pos.y - tempRadius && tempEntity.pos.y > player.pos.y + tempRadius) {
+                    || tempEntity.pos.y < player.pos.y - tempRadius || tempEntity.pos.y > player.pos.y + tempRadius) {
                 break;
             }
             if (tempEntity == player) {
