@@ -357,6 +357,10 @@ function addSetGuidelinePosCommand(player, commandList) {
     });
 }
 
+function isDirection(direction) {
+    return (direction === 0 || direction === 1 || direction === 2 || direction === 3);
+}
+
 function performStartPlayingCommand(command, player, commandList, done, errorHandler) {
     accountUtils.acquireLock(function() {
         accountUtils.findAccountByUsername(player.username, function(error, index, result) {
@@ -386,7 +390,8 @@ function performGetTilesCommand(command, player, commandList) {
 }
 
 function performWalkCommand(command, player, commandList) {
-    player.walk(command.direction);
+    if (isDirection(command.direction))
+        player.walk(command.direction);
 }
 
 function performAssertPosCommand(command, player, commandList) {
@@ -455,7 +460,8 @@ function performGetOnlinePlayersCommand(command, player, commandList) {
 }
 
 function performRemoveTileCommand(command, player, commandList) {
-    player.removeTile(command.direction);
+    if (isDirection(command.direction))
+        player.removeTile(command.direction);
 }
 
 function performGetInventoryChangesCommand(command, player, commandList) {
@@ -466,6 +472,8 @@ function performGetInventoryChangesCommand(command, player, commandList) {
 }
 
 function performPlaceTileCommand(command, player, commandList) {
+    if (!isDirection(command.direction))
+        return;
     var tempResult = player.placeTile(command.direction, command.tile);
     if (!tempResult) {
         addSetInventoryCommand(player.inventory, commandList);
@@ -473,7 +481,8 @@ function performPlaceTileCommand(command, player, commandList) {
 }
 
 function performCollectTileCommand(command, player, commandList) {
-    player.collectTile(command.direction);
+    if (isDirection(command.direction))
+        player.collectTile(command.direction);
 }
 
 function performGetRespawnPosChangesCommand(command, player, commandList) {
