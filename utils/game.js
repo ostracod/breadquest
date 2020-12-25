@@ -499,7 +499,8 @@ function performGetAvatarChangesCommand(command, player, commandList) {
 }
 
 function performPlaceSymbolTileCommand(command, player, commandList) {
-    player.placeSymbolTile(command.tile);
+    if (typeof(command.tile) == "number")
+        player.placeSymbolTile(command.tile);
 }
 
 function performSetGuidelinePosCommand(command, player, commandList) {
