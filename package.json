@@ -14,7 +14,7 @@
     "express-session": "^1.15.2",
     "express-ws": "^4.0.0",
     "jade": "~1.11.0",
-    "morgan": "~1.8.1",
+    "morgan": "~1.10.0",
     "mustache-express": "^1.2.4",
     "rootpath": "^0.1.2",
     "serve-favicon": "~2.4.2"
