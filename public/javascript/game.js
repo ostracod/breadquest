@@ -1331,15 +1331,20 @@ function displayGuideline() {
 
 function keyDownEvent(event) {
     lastActivityTime = 0;
-    var keyCode = event.which;
-    if (keyCode == 16) {
+    // event.code is based on the position on the keyboard, so use
+    // that for eg wasd where the position is what matters.
+    // event.key is the actual key typed, so use that for mnemonic
+    // keys like b for bread or t for text.
+    var keyCode = event.code;
+    var keyKey  = event.key;
+    if (keyCode == "ShiftLeft" || keyCode == "ShiftRight") {
         shiftKeyIsHeld = true;
     }
-    if (keyCode == 76) {
+    if (keyKey == "l" || keyKey == "L") {
         lKeyIsHeld = true;
     }
     if (chatInputIsFocused) {
-        if (keyCode == 13) {
+        if (keyCode == "Enter") {
             var tempText = chatInput.value;
             if (tempText.length > 0) {
                 addAddChatMessageCommand(tempText);
@@ -1347,7 +1352,7 @@ function keyDownEvent(event) {
             }
         }
     } else if (overlayChatInputIsFocused) {
-        if (keyCode == 13) {
+        if (keyCode == "Enter") {
             var tempText = overlayChatInput.value;
             if (tempText.length > 0) {
                 addAddChatMessageCommand(tempText);
@@ -1360,7 +1365,7 @@ function keyDownEvent(event) {
             canvasIsFocused = true;
         }
     } else if (textToPlaceInputIsFocused) {
-        if (keyCode == 13) {
+        if (keyCode == "Enter") {
             var tempText = textToPlaceInput.value;
             startPlacingText(tempText);
             textToPlaceInput.value = "";
@@ -1369,12 +1374,12 @@ function keyDownEvent(event) {
             canvasIsFocused = true;
         }
     } else if (guidelinePosInputIsFocused) {
-        if (keyCode == 13) {
+        if (keyCode == "Enter") {
             setGuidelinePosFromInput();
         }
     } else if (canvasIsFocused) {
         textToPlace = null;
-        if (keyCode == 13) {
+        if (keyCode == "Enter") {
             document.getElementById("overlayChat").style.display = "block";
             overlayChatInput.style.display = "block";
             overlayChatInputIsVisible = true;
@@ -1382,25 +1387,29 @@ function keyDownEvent(event) {
             overlayChatInput.focus();
             overlayChatInputIsFocused = true;
         }
-        if (keyCode == 37 || keyCode == 65) {
+        if (keyCode == "ArrowLeft" || keyCode == "KeyA") {
             localPlayer.performActionInDirection(3);
+            return false;
         }
-        if (keyCode == 39 || keyCode == 68) {
+        if (keyCode == "ArrowRight" || keyCode == "KeyD") {
             localPlayer.performActionInDirection(1);
+            return false;
         }
-        if (keyCode == 38 || keyCode == 87) {
+        if (keyCode == "ArrowUp" || keyCode == "KeyW") {
             localPlayer.performActionInDirection(0);
+            return false;
         }
-        if (keyCode == 40 || keyCode == 83) {
+        if (keyCode == "ArrowDown" || keyCode == "KeyS") {
             localPlayer.performActionInDirection(2);
+            return false;
         }
-        if (keyCode == 189 || keyCode == 173) {
+        if (keyKey == "-") {
             setZoom(0);
         }
-        if ((keyCode == 187 || keyCode == 61) && shiftKeyIsHeld) {
+        if (keyKey == "+") {
             setZoom(1);
         }
-        if (keyCode == 82) {
+        if (keyCode == "KeyR") {
             var index = selectedInventoryItemIndex - 1;
             if (index < 0) {
                 index = inventoryItemList.length - 1;
@@ -1408,7 +1417,7 @@ function keyDownEvent(event) {
             selectInventoryItem(index);
             centerSelectedInventoryItem();
         }
-        if (keyCode == 70) {
+        if (keyCode == "KeyF") {
             var index = selectedInventoryItemIndex + 1;
             if (index >= inventoryItemList.length) {
                 index = 0;
@@ -1416,39 +1425,40 @@ function keyDownEvent(event) {
             selectInventoryItem(index);
             centerSelectedInventoryItem();
         }
-        if (keyCode == 66) {
+        if (keyKey == "b") {
             addEatBreadCommand();
         }
-        if (keyCode == 84) {
+        if (keyKey == "t") {
             showModuleByName("textTool");
             textToPlaceInput.focus();
             return false;
         }
-        if (keyCode >= 37 && keyCode <= 40) {
+        /*if (keyCode >= 37 && keyCode <= 40) {
             return false;
-        }
+        }*/
     }
 }
 
 function keyUpEvent(event) {
     lastActivityTime = 0;
-    var keyCode = event.which;
-    if (keyCode == 16) {
+    var keyCode = event.code;
+    var keyKey = event.key;
+    if (keyCode == "ShiftLeft" || keyCode == "ShiftRight") {
         shiftKeyIsHeld = false;
     }
-    if (keyCode == 76) {
+    if (keyKey == "l" || keyKey == "L") {
         lKeyIsHeld = false;
     }
-    if (keyCode == 37 || keyCode == 65) {
+    if (keyCode == "ArrowLeft" || keyCode == "KeyA") {
         localPlayer.stopActionInDirection(3);
     }
-    if (keyCode == 39 || keyCode == 68) {
+    if (keyCode == "ArrowRight" || keyCode == "KeyD") {
         localPlayer.stopActionInDirection(1);
     }
-    if (keyCode == 38 || keyCode == 87) {
+    if (keyCode == "ArrowUp" || keyCode == "KeyW") {
         localPlayer.stopActionInDirection(0);
     }
-    if (keyCode == 40 || keyCode == 83) {
+    if (keyCode == "ArrowDown" || keyCode == "KeyS") {
         localPlayer.stopActionInDirection(2);
     }
 }
